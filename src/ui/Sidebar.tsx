@@ -29,7 +29,7 @@ const Sidebar = () => {
       href: "/transactions",
     },
     { label: "Reports", icon: <FileText />, href: "/reports" },
-    { label: "Users & Roles", icon: <UserCog />, href: "/UserRoles" },
+    { label: "Users & Roles", icon: <UserCog />, href: "/User-Roles" },
     { label: "Settings & Backup", icon: <Settings />, href: "/settings" },
   ];
 
