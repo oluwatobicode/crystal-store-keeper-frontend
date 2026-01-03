@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import Login from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard";
 import Sales from "./Pages/Sales";
@@ -15,6 +15,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route
           element={
