@@ -9,28 +9,37 @@ import {
 } from "lucide-react";
 import { BsBucketFill } from "react-icons/bs";
 import { Link } from "react-router";
+
 const Sidebar = () => {
   const menuItems = [
     {
       label: "Dashboard",
-      icon: <LayoutDashboard />,
+      icon: <LayoutDashboard size={19} />,
       href: "/dashboard",
     },
     {
       label: "Sales / New Transaction",
-      icon: <BsBucketFill />,
+      icon: <BsBucketFill size={19} />,
       href: "/sales",
     },
-    { label: "Customers", icon: <Users />, href: "/customers" },
-    { label: "Products & Stock", icon: <Package />, href: "/products" },
+    { label: "Customers", icon: <Users size={19} />, href: "/customers" },
+    {
+      label: "Products & Stock",
+      icon: <Package size={19} />,
+      href: "/products",
+    },
     {
       label: "Payments & Transactions",
-      icon: <CreditCard />,
+      icon: <CreditCard size={19} />,
       href: "/transactions",
     },
-    { label: "Reports", icon: <FileText />, href: "/reports" },
-    { label: "Users & Roles", icon: <UserCog />, href: "/UserRoles" },
-    { label: "Settings & Backup", icon: <Settings />, href: "/settings" },
+    { label: "Reports", icon: <FileText size={19} />, href: "/reports" },
+    { label: "Users & Roles", icon: <UserCog size={19} />, href: "/UserRoles" },
+    {
+      label: "Settings & Backup",
+      icon: <Settings size={19} />,
+      href: "/settings",
+    },
   ];
 
   return (
@@ -53,7 +62,7 @@ const Sidebar = () => {
                 className="flex items-center gap-[9px]  text-[#000000] hover:text-blue-600 transition-colors"
               >
                 {item.icon}
-                <span className="text-[14px]  text-[#000000] leading-[19.8px] tracking-normal font-medium">
+                <span className="text-[12px]  text-[#000000] leading-[19.8px] tracking-normal font-medium">
                   {item.label}
                 </span>
               </Link>

@@ -14,16 +14,11 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-[17px]">
-        <Bell
-          color="#707070"
-          width={30.18}
-          height={30.3}
-          className="cursor-pointer"
-        />
+        <Bell color="#707070" size={25} className="cursor-pointer" />
 
         <img
           src="user.jpg"
-          className="h-[43px] w-[43px] cursor-pointer rounded-full object-cover"
+          className="h-[35px] w-[35px] cursor-pointer rounded-full object-cover"
           alt="User profile"
         />
       </div>
