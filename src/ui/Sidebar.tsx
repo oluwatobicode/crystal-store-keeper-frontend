@@ -1,3 +1,4 @@
+import React from "react";
 import {
   CreditCard,
   LayoutDashboard,
@@ -6,12 +7,19 @@ import {
   UserCog,
   Users,
   FileText,
+  LogOut, // Added Logout icon
 } from "lucide-react";
 import { BsBucketFill } from "react-icons/bs";
-import { Link } from "react-router";
+import { NavLink } from "react-router";
 
-const Sidebar = () => {
-  const menuItems = [
+interface MenuItem {
+  label: string;
+  icon: React.ReactNode;
+  href: string;
+}
+
+const Sidebar: React.FC = () => {
+  const menuItems: MenuItem[] = [
     {
       label: "Dashboard",
       icon: <LayoutDashboard size={19} />,
@@ -43,9 +51,8 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="bg-white h-screen w-full px-4 border-r border-gray-100">
-      <div className="h-full py-5 flex flex-col items-center">
-        {/* Logo Section */}
+    <div className="bg-white h-screen w-full px-4 border-r border-gray-100 flex flex-col justify-between py-5">
+      <div className="flex flex-col items-center">
         <div className="mb-[50px]">
           <img
             src="Logo.svg"
@@ -54,22 +61,44 @@ const Sidebar = () => {
           />
         </div>
 
-        <ul className="flex flex-col items-start justify-center gap-[29px] w-full">
+        <ul className="flex flex-col items-start gap-[10px] w-full">
           {menuItems.map((item, index) => (
             <li key={index} className="w-full">
-              <Link
+              <NavLink
                 to={item.href}
-                className="flex items-center gap-[9px]  text-[#000000] hover:text-blue-600 transition-colors"
+                className={({ isActive }: { isActive: boolean }) =>
+                  `flex items-center gap-[9px] px-3 py-2 transition-all duration-200 ${
+                    isActive
+                      ? "bg-[#EDEDFB] rounded-[9px] text-[#1A47FE]"
+                      : "text-[#000000] hover:bg-gray-50 rounded-[9px]"
+                  }`
+                }
               >
-                {item.icon}
-                <span className="text-[12px]  text-[#000000] leading-[19.8px] tracking-normal font-medium">
+                <span className="shrink-0 flex items-center justify-center">
+                  {item.icon}
+                </span>
+                <span className="text-[12px] leading-[19.8px] tracking-normal font-medium">
                   {item.label}
                 </span>
-              </Link>
+              </NavLink>
             </li>
           ))}
         </ul>
       </div>
+
+      <button className="w-full border-t border-gray-50 pt-5">
+        <NavLink
+          to="/login"
+          className="flex items-center gap-[9px] px-3 py-2 text-[#000000] hover:bg-red-50 hover:text-red-600 transition-all duration-200 rounded-[9px]"
+        >
+          <span className="shrink-0 flex items-center justify-center">
+            <LogOut size={19} />
+          </span>
+          <span className="text-[12px] cursor-pointer leading-[19.8px] font-medium">
+            Logout
+          </span>
+        </NavLink>
+      </button>
     </div>
   );
 };

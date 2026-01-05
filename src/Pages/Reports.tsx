@@ -1,7 +1,9 @@
+import ReportsAnalyticsHeader from "../components/reports/ReportsAnalyticsHeader";
+
 const Reports = () => {
   return (
-    <div>
-      <h1>This is a reports page</h1>
+    <div className="mx-auto max-w-7xl space-y-10">
+      <ReportsAnalyticsHeader />
     </div>
   );
 };

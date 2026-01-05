@@ -75,7 +75,6 @@ const DashboardRecentTransactions = () => {
           ))}
         </div>
 
-        {/* Footer Button */}
         <div className="mt-[28px] w-full">
           <button className="px-7 bg-[#F8F8F8] hover:bg-gray-100 transition-colors py-5 text-[#71717A] font-medium leading-[16.2px] tracking-[0.9px] text-center cursor-pointer w-full rounded-lg">
             View All Transactions

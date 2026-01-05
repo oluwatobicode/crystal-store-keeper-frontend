@@ -1,7 +1,11 @@
+import AllPayments from "../components/payments/AllPayments";
+import PaymentsHeader from "../components/payments/PaymentsHeader";
+
 const Payments = () => {
   return (
-    <div>
-      <h1>This is the payments page</h1>
+    <div className="mx-auto max-w-7xl space-y-10">
+      <PaymentsHeader />
+      <AllPayments />
     </div>
   );
 };
