@@ -1,7 +1,9 @@
+import UserRolesHeader from "../components/users/UserRolesHeader";
+
 const UserRoles = () => {
   return (
     <div>
-      <h1>This is the user roles page</h1>
+      <UserRolesHeader />
     </div>
   );
 };

@@ -1,7 +1,9 @@
+import SettingsHeader from "../components/settings/SettingsHeader";
+
 const Settings = () => {
   return (
-    <div className="">
-      <h1>This is a settings page</h1>
+    <div className="mx-auto max-w-7xl space-y-10">
+      <SettingsHeader />
     </div>
   );
 };
