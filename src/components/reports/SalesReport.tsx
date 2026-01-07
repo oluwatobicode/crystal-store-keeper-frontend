@@ -91,7 +91,7 @@ const SalesReport = () => {
         ))}
       </div>
 
-      <div className="bg-white w-full flex flex-col items-start justify-center h-auto px-[24px] py-[24px]  rounded-sm">
+      <div className="bg-white w-full flex flex-col items-start justify-center h-auto px-[24px] py-[24px]">
         <h1 className="uppercase font-medium text-[20px] mb-5 tracking-[0.9px] leading-[16.2px] text-[#71717A]">
           Daily Sales Breakdown
         </h1>

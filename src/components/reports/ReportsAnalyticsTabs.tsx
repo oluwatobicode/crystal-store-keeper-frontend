@@ -1,5 +1,8 @@
 import { useState } from "react";
 import SalesReport from "./SalesReport";
+import ProductAnalysis from "./ProductAnalysis";
+import PaymentMethods from "./PaymentMethods";
+import StockMovement from "./StockMovement";
 
 const tabsSection = [
   { tab: "Sales Report" },
@@ -32,6 +35,9 @@ const ReportsAnalyticsTabs = () => {
       </div>
 
       {currentTab === "Sales Report" && <SalesReport />}
+      {currentTab === "Product Analysis" && <ProductAnalysis />}
+      {currentTab === "Payment Methods" && <PaymentMethods />}
+      {currentTab === "Stock Movement" && <StockMovement />}
     </div>
   );
 };
