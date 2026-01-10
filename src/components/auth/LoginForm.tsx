@@ -1,6 +1,7 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router";
 
 const UserLoginSchema = z.object({
   username: z
@@ -12,6 +13,7 @@ const UserLoginSchema = z.object({
 type LoginFormData = z.infer<typeof UserLoginSchema>;
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const {
     register,
 
@@ -21,6 +23,7 @@ const LoginForm = () => {
 
   const handleLogin: SubmitHandler<LoginFormData> = (data) => {
     console.log(data);
+    navigate("/dashboard");
   };
 
   return (
