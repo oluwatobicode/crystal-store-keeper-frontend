@@ -1,5 +1,9 @@
 import { useState } from "react";
 import BusinessSettings from "./BusinessSettings";
+import InvoiceSettings from "./InvoiceSettings";
+import AuditLogsSettings from "./AuditLogsSettings";
+import BackupSettings from "./BackupSettings";
+import SystemSettings from "./SystemSettings";
 
 const settingsTabs = [
   { tab: "Business" },
@@ -33,6 +37,10 @@ const SettingsTabs = () => {
       </div>
 
       {currentTab === "Business" && <BusinessSettings />}
+      {currentTab === "Invoice" && <InvoiceSettings />}
+      {currentTab === "System" && <SystemSettings />}
+      {currentTab === "Audit Logs" && <AuditLogsSettings />}
+      {currentTab === "Backup" && <BackupSettings />}
     </div>
   );
 };
