@@ -69,7 +69,7 @@ const SalesReport = () => {
       <div className="grid grid-cols-3 gap-[22px]">
         {salesReport.map((ele, index) => (
           <div
-            className="bg-white flex flex-col gap-[24px] py-5 px-10 rounded-sm"
+            className="bg-white border border-[#E2E4E9]  flex flex-col gap-[24px] py-5 px-10 rounded-[9px]"
             key={index}
           >
             <h2 className="text-[12px] font-medium leading-[16.2px] tracking-[0.9px] uppercase text-[#71717A]">
@@ -91,13 +91,13 @@ const SalesReport = () => {
         ))}
       </div>
 
-      <div className="bg-white w-full flex flex-col items-start justify-center h-auto px-[24px] py-[24px]">
+      <div className="bg-white border border-[#E2E4E9] w-full flex flex-col items-start justify-center h-auto px-[24px] py-[24px]">
         <h1 className="uppercase font-medium text-[20px] mb-5 tracking-[0.9px] leading-[16.2px] text-[#71717A]">
           Daily Sales Breakdown
         </h1>
 
         <table className="w-full text-left">
-          <thead className="border-b border-[#E1E4EA]">
+          <thead className="border-b border-[#DEDEDE]">
             <tr>
               {["Date", "Sales", "Transactions", "Avg Value"].map((head) => (
                 <th
@@ -113,16 +113,16 @@ const SalesReport = () => {
           <tbody className="bg-white divide-y divide-[#E1E4EA]">
             {dailySalesData.map((row, index) => (
               <tr key={index}>
-                <td className="p-4 text-xs font-medium text-[#6C7788] tracking-wider">
+                <td className="p-4 text-xs font-medium text-[#000000] tracking-wider">
                   {row.date}
                 </td>
-                <td className="p-4 text-xs font-medium text-[#6C7788] tracking-wider">
+                <td className="p-4 text-xs  text-[#000000] font-bold tracking-wider">
                   {row.sales}
                 </td>
-                <td className="p-4 text-xs font-medium text-[#6C7788] tracking-wider">
+                <td className="p-4 text-xs font-medium text-[#000000] tracking-wider">
                   {row.transactions}
                 </td>
-                <td className="p-4 text-xs font-medium text-[#6C7788] tracking-wider">
+                <td className="p-4 text-xs font-medium text-[#000000] tracking-wider">
                   {row.avgValue}
                 </td>
               </tr>

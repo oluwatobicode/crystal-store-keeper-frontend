@@ -41,7 +41,7 @@ const CustomerAnalytics = () => {
             {customerTotal.map((ele, index) => (
               <div
                 key={index}
-                className="flex flex-col w-full gap-[12px] rounded-[9px] bg-white px-8 py-[22px]"
+                className="flex flex-col  border border-[#E4E4E7] w-full gap-[12px] rounded-[9px] bg-white px-8 py-[22px]"
               >
                 <p className="text-[12px] font-medium leading-[16.2px] tracking-[0.9px] uppercase text-[#71717A]">
                   {ele.title}

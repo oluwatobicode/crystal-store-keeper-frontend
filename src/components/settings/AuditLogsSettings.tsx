@@ -1,6 +1,5 @@
 import { History, Download, ChevronDown } from "lucide-react";
 
-// Data transcribed from your screenshot (ddd.jpg)
 const auditLogsData = [
   {
     timestamp: "2024-01-15 14:30:25",
@@ -42,9 +41,7 @@ const auditLogsData = [
 const AuditLogsSettings = () => {
   return (
     <div className="flex flex-col gap-[26px] bg-white w-full h-auto px-[24px] py-[24px] border border-[#E2E4E9] rounded-[12px]">
-      {/* --- HEADER SECTION --- */}
       <div className="flex flex-row items-start justify-between">
-        {/* Left: Title & Subtitle */}
         <div className="flex flex-col gap-[8px]">
           <h1 className="font-medium gap-[10px] flex flex-row items-center uppercase text-black text-[15px] tracking-[0.9px] leading-tight">
             <span>
@@ -57,23 +54,19 @@ const AuditLogsSettings = () => {
           </p>
         </div>
 
-        {/* Right: Actions */}
         <div className="flex items-center gap-[12px]">
-          {/* Category Dropdown */}
-          <button className="flex items-center gap-2 h-[36px] px-3 bg-white border border-[#E2E4E9] rounded-[8px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-50 transition-colors">
+          <button className="flex cursor-pointer items-center gap-2 h-[36px] px-3 bg-white border border-[#E2E4E9] rounded-[8px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-50 transition-colors">
             All Categories
             <ChevronDown size={14} className="text-[#71717A]" />
           </button>
 
-          {/* Export Button */}
-          <button className="flex items-center gap-2 h-[36px] px-3 bg-white border border-[#E2E4E9] rounded-[8px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-50 transition-colors">
+          <button className="flex cursor-pointer items-center gap-2 h-[36px] px-3 bg-white border border-[#E2E4E9] rounded-[8px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-50 transition-colors">
             <Download size={14} className="text-[#71717A]" />
             Export Logs
           </button>
         </div>
       </div>
 
-      {/* --- TABLE SECTION --- */}
       <div className="w-full overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -96,27 +89,22 @@ const AuditLogsSettings = () => {
                 key={index}
                 className="group hover:bg-[#FAFAFB] transition-colors"
               >
-                {/* Timestamp */}
                 <td className="py-4 pr-4 text-[13px] font-bold text-[#1D1D1D] tracking-normal whitespace-nowrap">
                   {log.timestamp}
                 </td>
 
-                {/* User */}
                 <td className="py-4 pr-4 text-[13px] font-medium text-[#1D1D1D] tracking-normal">
                   {log.user}
                 </td>
 
-                {/* Action */}
                 <td className="py-4 pr-4 text-[13px] font-bold text-[#1D1D1D] tracking-normal">
                   {log.action}
                 </td>
 
-                {/* Details */}
                 <td className="py-4 pr-4 text-[13px] font-medium text-[#71717A] tracking-normal max-w-[300px] truncate">
                   {log.details}
                 </td>
 
-                {/* Category Badge */}
                 <td className="py-4">
                   <span className="inline-flex items-center px-[12px] py-[4px] rounded-full border border-[#E4E4E7] bg-white text-[11px] font-medium text-[#71717A]">
                     {log.category}

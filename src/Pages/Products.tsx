@@ -1,7 +1,11 @@
+import ProductsHeader from "../components/products/ProductsHeader";
+import ProductsTabs from "../components/products/ProductsTabs";
+
 const Products = () => {
   return (
     <div>
-      <h1>Products</h1>
+      <ProductsHeader />
+      <ProductsTabs />
     </div>
   );
 };

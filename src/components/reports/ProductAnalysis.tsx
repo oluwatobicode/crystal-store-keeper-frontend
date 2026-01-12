@@ -59,22 +59,22 @@ const ProductAnalysis = () => {
           </tr>
         </thead>
 
-        <tbody className="bg-white divide-y divide-[#E1E4EA]">
+        <tbody className="bg-white divide-y divide-[#DEDEDE]">
           {topSellingProduct.map((row, index) => (
             <tr key={index}>
-              <td className="p-4 text-xs font-medium text-[#6C7788] tracking-wider">
+              <td className="p-4 text-xs font-medium text-[#000000] tracking-wider">
                 {row.productName}
               </td>
-              <td className="p-4 text-xs font-medium text-[#6C7788] tracking-wider">
+              <td className="p-4 text-xs font-medium text-[#000000] tracking-wider">
                 {row.quantity}
               </td>
-              <td className="p-4 text-xs font-medium text-[#6C7788] tracking-wider">
+              <td className="p-4 text-xs font-medium text-[#069F3E] tracking-wider">
                 {row.sales}
               </td>
-              <td className="p-4 text-xs font-medium text-[#6C7788] tracking-wider">
+              <td className="p-4 text-xs font-medium text-[#000000] tracking-wider">
                 {row.transactions}
               </td>
-              <td className="p-4 text-xs font-medium text-[#6C7788] tracking-wider">
+              <td className="p-4 text-xs font-medium text-[#000000] tracking-wider">
                 {row.avgValue}
               </td>
             </tr>

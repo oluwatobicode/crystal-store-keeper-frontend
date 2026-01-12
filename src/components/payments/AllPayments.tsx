@@ -4,7 +4,8 @@ import {
   CreditCard,
   Link,
   User,
-  CheckCircle2,
+  Eye,
+  CircleCheckBig,
 } from "lucide-react";
 
 const paymentsHistory = [
@@ -92,21 +93,21 @@ const AllPayments = () => {
         {paymentsHistory.map((item, index) => (
           <div
             key={index}
-            className="bg-white p-8 flex flex-row justify-between items-center"
+            className="bg-white border border-[#E2E4E9] rounded-[12px] p-8 flex flex-row justify-between items-center"
           >
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-4">
-                <h3 className="text-[#71717A] text-[18px] font-medium tracking-tight">
+                <h3 className="text-black text-[18px] font-medium tracking-tight">
                   {item.invoiceNo}
                 </h3>
 
-                <div className="flex items-center gap-1 bg-[#C6F6D5] text-[#2F855A] px-3 py-1 rounded-full text-[12px] font-bold">
-                  <CheckCircle2 size={14} />
+                <div className="flex items-center gap-1 bg-[#C6F6D5] border border-[#22C35D4D] text-[#2F855A] px-3 py-1 rounded-full text-[12px] font-medium">
+                  <CircleCheckBig size={14} />
                   Paid
                 </div>
               </div>
 
-              <h2 className="text-[#1D1D1D] text-[16px] font-semibold">
+              <h2 className="text-[#71717A] text-[16px] font-semibold">
                 {item.company}
               </h2>
 
@@ -133,10 +134,13 @@ const AllPayments = () => {
             </div>
 
             <div className="flex flex-col items-end gap-4">
-              <h2 className="text-[#71717A] leading-[16.2px] tracking-[0.9px] text-[18px] font-medium">
+              <h2 className="text-[#000000] leading-[16.2px] tracking-[0.9px] text-[18px] font-medium">
                 {item.amount}
               </h2>
-              <button className="bg-[#1A47FE] text-white px-8 py-2.5 rounded-[8px] text-[12px] font-medium cursor-pointer hover:bg-blue-700 transition-colors">
+              <button className="bg-[#F9FAFB] border border-[#E4E4E7] flex items-center justify-center gap-[10px] text-black px-3.5 py-2 rounded-[8px] text-[12px] font-medium cursor-pointer  transition-colors">
+                <span>
+                  <Eye size={20} />
+                </span>
                 View details
               </button>
             </div>

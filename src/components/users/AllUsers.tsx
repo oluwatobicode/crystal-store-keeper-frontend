@@ -81,7 +81,7 @@ const AllUsers = () => {
           Add User
         </button>
       </div>
-      {/* Search & Filter */}
+
       <div className="flex flex-row items-center gap-4">
         <div className="relative w-full max-w-[348px]">
           <Search className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -96,7 +96,7 @@ const AllUsers = () => {
           <h2>All Status</h2>
         </div>
       </div>
-      {/* Table */}
+
       <table className="w-full text-left mt-4">
         <thead className="border-b border-[#E1E4EA]">
           <tr>

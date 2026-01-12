@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 
 const AppLayout = () => {
   return (
-    <section className="h-screen w-full  max-w-[1440px] bg-[#FAFAFB]">
+    <section className="h-screen w-full max-w-[1440px] mx-auto bg-[#FAFAFB]">
       <div className="flex h-full">
         <div className="w-[280px] shrink-0 h-full border-r border-gray-200">
           <Sidebar />

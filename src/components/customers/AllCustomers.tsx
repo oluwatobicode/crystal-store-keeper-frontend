@@ -55,7 +55,7 @@ const AllCustomers = () => {
       <div className="flex flex-col gap-[40px]">
         {allCustomers.map((el) => (
           <div
-            className="w-full h-auto p-[24px] bg-white flex flex-col gap-4"
+            className="w-full h-auto p-[24px]  border border-[#E4E4E7] bg-white flex flex-col gap-4"
             key={el.customerId}
           >
             <h3 className="text-[#71717A] text-[18px] font-medium tracking-tight">
