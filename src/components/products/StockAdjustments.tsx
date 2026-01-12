@@ -1,27 +1,12 @@
 import { Search, ChevronDown, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 
-const StockAdjustmentSchema = z.object({
-  productId: z.string().min(1, "Please select a product"),
-  adjustmentType: z.enum(["add", "deduct", "correction"], {
-    message: "Select adjustment type",
-  }),
-  quantity: z
-    .string()
-    .min(1, "Quantity is required")
-    .transform((val) => parseInt(val, 10))
-    .refine((val) => !isNaN(val) && val >= 1, {
-      message: "Quantity must be at least 1",
-    })
-    .refine((val) => Number.isInteger(val), {
-      message: "Must be a whole number",
-    }),
-  reason: z.string().min(5, "Please provide a valid reason (min 5 chars)"),
-});
-
-type StockAdjustmentFormData = z.infer<typeof StockAdjustmentSchema>;
+type StockAdjustmentFormData = {
+  productId: string;
+  adjustmentType: "add" | "deduct" | "correction" | "";
+  quantity: string;
+  reason: string;
+};
 
 const StockAdjustments = () => {
   const {
@@ -30,12 +15,20 @@ const StockAdjustments = () => {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<StockAdjustmentFormData>({
-    resolver: zodResolver(StockAdjustmentSchema),
+    defaultValues: {
+      productId: "",
+      adjustmentType: "",
+      quantity: "",
+      reason: "",
+    },
   });
 
   const onSubmit = async (data: StockAdjustmentFormData) => {
-    // Simulate API Call
-    console.log("Adjustment Submitted:", data);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log("Adjustment Submitted:", {
+      ...data,
+      quantity: parseInt(data.quantity, 10),
+    });
     reset();
   };
 
@@ -61,7 +54,9 @@ const StockAdjustments = () => {
               <input
                 type="text"
                 placeholder="Search product..."
-                {...register("productId")}
+                {...register("productId", {
+                  required: "Please select a product",
+                })}
                 className="w-full h-[44px] bg-white border border-[#E2E4E9] rounded-[8px] pl-9 pr-3 text-[13px] outline-none  transition-colors"
               />
             </div>
@@ -78,7 +73,9 @@ const StockAdjustments = () => {
             </label>
             <div className="relative w-full">
               <select
-                {...register("adjustmentType")}
+                {...register("adjustmentType", {
+                  required: "Select adjustment type",
+                })}
                 className="w-full h-[44px] cursor-pointer bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] text-[#71717A] appearance-none outline-none  transition-colors"
               >
                 <option value="">Select type</option>
@@ -105,7 +102,19 @@ const StockAdjustments = () => {
             <input
               type="number"
               placeholder="+/- quantity"
-              {...register("quantity")}
+              {...register("quantity", {
+                required: "Quantity is required",
+                min: {
+                  value: 1,
+                  message: "Quantity must be at least 1",
+                },
+                validate: (value) => {
+                  const num = parseInt(value, 10);
+                  if (isNaN(num)) return "Must be a valid number";
+                  if (!Number.isInteger(num)) return "Must be a whole number";
+                  return true;
+                },
+              })}
               className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none  transition-colors placeholder:text-[#A1A1AA]"
             />
             {errors.quantity && (
@@ -123,8 +132,14 @@ const StockAdjustments = () => {
           <input
             type="text"
             placeholder="Describe the reason for adjustment..."
-            {...register("reason")}
-            className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors placeholder:text-[#A1A1AA]"
+            {...register("reason", {
+              required: "Reason is required",
+              minLength: {
+                value: 5,
+                message: "Please provide a valid reason (min 5 chars)",
+              },
+            })}
+            className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none  transition-colors placeholder:text-[#A1A1AA]"
           />
           {errors.reason && (
             <span className="text-red-500 text-[11px]">
