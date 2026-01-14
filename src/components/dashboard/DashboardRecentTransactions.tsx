@@ -33,7 +33,7 @@ const recentTransactions = [
 
 const DashboardRecentTransactions = () => {
   return (
-    <div className="w-full bg-white h-auto px-5 py-10 rounded-[9px]">
+    <div className="w-full bg-white border border-[#E2E4E9] h-auto px-5 py-10 rounded-[9px]">
       <div className="flex flex-col">
         <div className="flex flex-row items-center gap-[8px] mb-2">
           <History className="text-[#71717A]" size={20} />

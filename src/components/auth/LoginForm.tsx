@@ -28,7 +28,7 @@ const LoginForm = () => {
   return (
     <form
       onSubmit={handleSubmit(handleLogin)}
-      className="flex flex-col justify-center items-center gap-6 w-full max-w-[484px] p-6 h-auto mx-4 bg-white rounded-[20px] shadow-2xl"
+      className="flex flex-col justify-center border border-[#E2E4E9] items-center gap-6 w-full max-w-[484px] p-6 h-auto mx-4 bg-white rounded-[20px] shadow-[0px_0px_20px_rgba(0,_0,_0,_0.05)]"
     >
       <div className="flex flex-col w-full items-start">
         <div className="flex w-full mb-5">
@@ -58,8 +58,7 @@ const LoginForm = () => {
         </label>
         <input
           id="username"
-          required
-          className={`w-full h-[41px] border outline-none focus:border-[#1A47FE] transition-colors px-3 ${
+          className={`w-full h-[41px] border outline-none rounded-[12px] transition-colors px-3 ${
             errors.username ? "border-red-600" : " border-[#F2F2F2]"
           }`}
           type="text"
@@ -82,10 +81,9 @@ const LoginForm = () => {
         </label>
         <input
           id="password"
-          required
           type="password"
           placeholder="pin / password"
-          className={`w-full h-[41px] border outline-none focus:border-[#1A47FE] transition-colors px-3 ${
+          className={`w-full h-[41px] border rounded-[12px] outline-none transition-colors px-3 ${
             errors.password ? "border-red-600" : " border-[#F2F2F2]"
           }`}
           {...register("password")}

@@ -48,7 +48,7 @@ const DashboardCards = () => {
           <div className="grid grid-cols-4 gap-[22.3px]">
             {mainStats.map((ele, index) => (
               <div
-                className="flex w-full flex-col gap-[24px] rounded-xl border border-gray-100 bg-white px-8 py-[22px]"
+                className="flex w-full flex-col gap-[24px] rounded-xl border border-[#E2E4E9] bg-white px-8 py-[22px]"
                 key={index}
               >
                 <h2 className="text-[12px] font-medium leading-tight uppercase text-[#71717A]">
