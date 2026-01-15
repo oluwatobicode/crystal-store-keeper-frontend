@@ -1,40 +1,18 @@
 import { MapPin, Phone, Search } from "lucide-react";
 import { MdEmail } from "react-icons/md";
+import { type Customer } from "../../Pages/Customers";
 
-const allCustomers = [
-  {
-    name: "Smith Construction Ltd",
-    email: "orders@smithconstruction.co.uk",
-    number: "01234 567890",
-    location: "123 Builder Street, Construction City, CC1 2AB",
-    customerId: "C001",
-    lastPurchase: "15/01/2024",
-    totalSpent: "₦5,420.50",
-    transactions: "28",
-  },
-  {
-    name: "Nexus Tech Solutions",
-    email: "support@nexustech.ng",
-    number: "0809 123 4567",
-    location: "42 Silicon Avenue, Yaba, Lagos",
-    customerId: "C002",
-    lastPurchase: "02/02/2024",
-    totalSpent: "₦250,000.00",
-    transactions: "12",
-  },
-  {
-    name: "Sarah Johnson",
-    email: "sarah.johnson@gmail.com",
-    number: "07123 456789",
-    location: "12 Residential Road, Home Town, HT7 8GH",
-    customerId: "C004",
-    lastPurchase: "12/01/2024",
-    totalSpent: "₦40,185.30",
-    transactions: "6",
-  },
-];
+interface AllCustomersProps {
+  customers: Customer[];
+  onEditClick: (customer: Customer) => void;
+  onViewClick: (customer: Customer) => void;
+}
 
-const AllCustomers = () => {
+const AllCustomers = ({
+  customers,
+  onEditClick,
+  onViewClick,
+}: AllCustomersProps) => {
   return (
     <div className="flex flex-col gap-[13px] px-0 py-0">
       <div className="flex flex-row items-center justify-between">
@@ -53,12 +31,12 @@ const AllCustomers = () => {
       </div>
 
       <div className="flex flex-col gap-[40px]">
-        {allCustomers.map((el) => (
+        {customers.map((el) => (
           <div
             className="w-full h-auto p-[24px]  border border-[#E4E4E7] bg-white flex flex-col gap-4"
             key={el.customerId}
           >
-            <h3 className="text-[#71717A] text-[18px] font-medium tracking-tight">
+            <h3 className="text-[#000000] text-[18px] font-medium tracking-tight">
               {el.name}
             </h3>
 
@@ -67,19 +45,19 @@ const AllCustomers = () => {
                 <div className="flex flex-col gap-[8px] min-w-[300px]">
                   <div className="flex items-center gap-[10px]">
                     <MdEmail className="text-black" size={16} />
-                    <p className="text-[13px] text-[#71717A] font-medium">
+                    <p className="text-[13px] text-[#000000] font-medium">
                       {el.email}
                     </p>
                   </div>
                   <div className="flex items-center gap-[10px]">
                     <Phone className="text-black" size={14} />
-                    <p className="text-[13px] text-[#71717A] font-medium">
+                    <p className="text-[13px] text-[#000000] font-medium">
                       {el.number}
                     </p>
                   </div>
                   <div className="flex items-center gap-[10px]">
                     <MapPin className="text-black" size={14} />
-                    <p className="text-[13px] text-[#71717A] font-medium">
+                    <p className="text-[13px] text-[#000000] font-medium">
                       {el.location}
                     </p>
                   </div>
@@ -125,10 +103,16 @@ const AllCustomers = () => {
               </div>
 
               <div className="flex flex-col gap-[12px] shrink-0 ml-10">
-                <button className="bg-[#1A47FE] cursor-pointer text-white text-[12px] font-medium px-6 py-2 rounded-[8px]">
+                <button
+                  onClick={() => onViewClick(el)}
+                  className="bg-[#1A47FE] cursor-pointer text-white text-[12px] font-medium px-6 py-2 rounded-[8px]"
+                >
                   View Details
                 </button>
-                <button className="bg-[#F8F8F8] cursor-pointer text-[#71717A] text-[12px] font-medium px-6 py-2 rounded-[8px]">
+                <button
+                  onClick={() => onEditClick(el)}
+                  className="bg-[#F8F8F8] cursor-pointer text-[#71717A] text-[12px] font-medium px-6 py-2 rounded-[8px]"
+                >
                   Edit
                 </button>
                 <button className="bg-[#F8F8F8] cursor-pointer text-[#71717A] text-[12px] font-medium px-6 py-2 rounded-[8px]">

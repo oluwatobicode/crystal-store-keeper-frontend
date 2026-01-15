@@ -17,7 +17,11 @@ const customerTotal = [
   },
 ];
 
-const CustomerAnalytics = () => {
+interface CustomerAnalyticsProps {
+  onAddClick?: () => void;
+}
+
+const CustomerAnalytics = ({ onAddClick }: CustomerAnalyticsProps) => {
   return (
     <div className="w-full max-w-[1090.5px]">
       <div className="mx-auto flex max-w-screen-2xl flex-col gap-6 px-0 py-0">
@@ -31,7 +35,10 @@ const CustomerAnalytics = () => {
             </p>
           </div>
 
-          <button className="rounded-[8px] px-3 py-[12px] font-medium text-[12px] text-[#71717A]  leading-[16.2px] tracking-[0.9px] bg-white cursor-pointer">
+          <button
+            onClick={onAddClick}
+            className="rounded-[8px] px-3 py-[12px] font-medium text-[12px] text-[#71717A]  leading-[16.2px] tracking-[0.9px] bg-white cursor-pointer hover:bg-gray-50 transition-colors"
+          >
             Add Customer
           </button>
         </div>

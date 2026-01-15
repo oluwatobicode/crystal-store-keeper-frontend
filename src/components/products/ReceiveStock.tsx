@@ -249,15 +249,14 @@ const ReceiveStock = () => {
       <div className="flex justify-end gap-[12px] mt-4 pt-4 border-t border-[#F4F4F5]">
         <button
           type="button"
-          onClick={() => reset()}
           className="h-[40px] px-6 cursor-pointer bg-white border border-[#E2E4E9] rounded-[8px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-50 transition-colors"
         >
-          Clear Form
+          Save Draft
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="h-[40px] px-6 cursor-pointer bg-[#1A47FE] hover:bg-blue-700 text-white rounded-[8px] text-[13px] font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
+          className="h-[40px] px-6 cursor-pointer bg-[#2474F5] text-white rounded-[8px] text-[13px] font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
         >
           {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : null}
           Complete Delivery

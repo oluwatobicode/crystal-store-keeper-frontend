@@ -1,5 +1,9 @@
 import { EyeIcon, PlusIcon, Search, SquarePen, Trash2 } from "lucide-react";
 
+interface AllUsersProps {
+  onAddUserClick: () => void;
+}
+
 const allUsers = [
   {
     userId: "U-1023",
@@ -51,7 +55,7 @@ const allUsers = [
   },
 ];
 
-const AllUsers = () => {
+const AllUsers = ({ onAddUserClick }: AllUsersProps) => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Active":
@@ -76,7 +80,10 @@ const AllUsers = () => {
             Manage user accounts and access
           </p>
         </div>
-        <button className="px-[16px] py-[9px] cursor-pointer bg-[#2474F5] hover:bg-blue-600 transition-colors text-white tracking-[0.9px] rounded-[8px] text-[14px] font-medium flex items-center gap-2">
+        <button
+          onClick={onAddUserClick}
+          className="px-[16px] py-[9px] cursor-pointer bg-[#2474F5] hover:bg-blue-600 transition-colors text-white tracking-[0.9px] rounded-[8px] text-[14px] font-medium flex items-center gap-2"
+        >
           <PlusIcon size={16} />
           Add User
         </button>

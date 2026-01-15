@@ -31,13 +31,26 @@ const recentTransactions = [
   },
 ];
 
+const getStyle = (type: string) => {
+  switch (type) {
+    case "Card":
+      return "bg-[#E0F2FF] text-[#0369A1]";
+    case "Cash":
+      return "bg-[#22C35D1A] text-[#22C35D]";
+    case "Transfer":
+      return "bg-[#2474F51A] text-[#1A47FE]";
+  }
+
+  return "";
+};
+
 const DashboardRecentTransactions = () => {
   return (
     <div className="w-full bg-white border border-[#E2E4E9] h-auto px-5 py-10 rounded-[9px]">
       <div className="flex flex-col">
         <div className="flex flex-row items-center gap-[8px] mb-2">
           <History className="text-[#71717A]" size={20} />
-          <h2 className="text-[#71717A] text-[14px] leading-[16.2px] tracking-[0.9px] font-medium uppercase">
+          <h2 className="text-[#000000] text-[14px] leading-[16.2px] tracking-[0.9px] font-medium uppercase">
             Recent Transactions
           </h2>
         </div>
@@ -50,11 +63,15 @@ const DashboardRecentTransactions = () => {
             >
               <div className="flex flex-col items-start gap-[4px]">
                 <div className="flex flex-row items-center gap-[6px]">
-                  <h3 className="text-[#71717A] font-normal tracking-normal leading-[23.4px]">
+                  <h3 className="text-[#000000] font-normal tracking-normal leading-[23.4px]">
                     {el.invoiceNo}
                   </h3>
 
-                  <div className="cursor-pointer px-3 py-1 bg-[#1A47FE] text-white rounded-full text-[10px] font-medium shrink-0">
+                  <div
+                    className={`cursor-pointer px-3 py-1 ${getStyle(
+                      el.method
+                    )} rounded-full text-[11px] font-semibold shrink-0`}
+                  >
                     {el.method}
                   </div>
                 </div>
@@ -68,7 +85,7 @@ const DashboardRecentTransactions = () => {
                 </p>
               </div>
 
-              <div className="cursor-pointer px-3 py-1.5 bg-white hover:bg-gray-200 transition-colors rounded-[8px] text-[12px] font-medium text-[#71717A]">
+              <div className="cursor-pointer px-3 py-1.5 text-[14px] font-semibold text-[#000000] leading-[16.2px] tracking-[0.9px]">
                 {el.price}
               </div>
             </div>

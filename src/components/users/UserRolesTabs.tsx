@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AllUsers from "./AllUsers";
 import RolesPermission from "./RolesPermission";
+import UserModal from "../../ui/UserModal";
 
 const userSection = [
   { tab: "User Management" },
@@ -11,6 +12,7 @@ type userTabType = (typeof userSection)[number]["tab"];
 
 const UserRolesTabs = () => {
   const [currentTab, setCurrentTab] = useState<userTabType>("User Management");
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   return (
     <div className="flex flex-col  gap-[24px]">
@@ -30,8 +32,19 @@ const UserRolesTabs = () => {
         ))}
       </div>
 
-      {currentTab === "User Management" && <AllUsers />}
+      {currentTab === "User Management" && (
+        <AllUsers onAddUserClick={() => setIsModalOpen(true)} />
+      )}
       {currentTab === "Roles & Permission" && <RolesPermission />}
+
+      {isModalOpen && (
+        <UserModal
+          onClose={() => setIsModalOpen(false)}
+          onSave={(data) => {
+            console.log("Saved:", data);
+          }}
+        />
+      )}
     </div>
   );
 };

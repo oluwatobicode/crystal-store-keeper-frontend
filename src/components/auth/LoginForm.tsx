@@ -58,7 +58,7 @@ const LoginForm = () => {
         </label>
         <input
           id="username"
-          className={`w-full h-[41px] border outline-none rounded-[12px] transition-colors px-3 ${
+          className={`w-full h-[41px] placeholder:text-[12px] border outline-none rounded-[12px] transition-colors px-3 ${
             errors.username ? "border-red-600" : " border-[#F2F2F2]"
           }`}
           type="text"
@@ -83,7 +83,7 @@ const LoginForm = () => {
           id="password"
           type="password"
           placeholder="pin / password"
-          className={`w-full h-[41px] border rounded-[12px] outline-none transition-colors px-3 ${
+          className={`w-full h-[41px] placeholder:text-[12px] border rounded-[12px] outline-none transition-colors px-3 ${
             errors.password ? "border-red-600" : " border-[#F2F2F2]"
           }`}
           {...register("password")}

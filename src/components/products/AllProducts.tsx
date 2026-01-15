@@ -130,7 +130,7 @@ const AllProducts = () => {
                   Reorder at:{" "}
                   <span className="text-[#1D1D1D]">{product.reorderAt}</span>
                 </p>
-                <p className="text-[11px] text-[#71717A] font-medium">
+                <p className="text-[11px] text-[#71717A] font-bold">
                   Days left:{" "}
                   <span className="text-[#1D1D1D]">{product.daysLeft}</span>
                 </p>
