@@ -1,4 +1,6 @@
-import { Shield, SquarePen } from "lucide-react"; // Imported SquarePen for the edit icon
+import { Shield, SquarePen } from "lucide-react";
+import { useState } from "react";
+import CustomRulesModal from "../../ui/CustomRulesModal";
 
 const rolesData = [
   {
@@ -39,6 +41,8 @@ const rolesData = [
 ];
 
 const RolesPermission = () => {
+  const [isRulesModalOpen, setIsRulesModalOpen] = useState<boolean>(false);
+
   return (
     <div className="flex flex-col w-full gap-[24px] px-[24px] h-auto py-[24px] bg-white ">
       <div className="flex flex-row w-full justify-between items-center py-[16px]">
@@ -51,7 +55,10 @@ const RolesPermission = () => {
           </p>
         </div>
 
-        <button className="px-[16px] py-[9px] cursor-pointer bg-[#2474F5] hover:bg-blue-600 transition-colors text-white tracking-[0.9px] rounded-[8px] text-[14px] font-medium flex items-center gap-2">
+        <button
+          onClick={() => setIsRulesModalOpen(true)}
+          className="px-[16px] py-[9px] cursor-pointer bg-[#2474F5] hover:bg-blue-600 transition-colors text-white tracking-[0.9px] rounded-[8px] text-[14px] font-medium flex items-center gap-2"
+        >
           <Shield size={16} />
           Create Custom Role
         </button>
@@ -96,6 +103,11 @@ const RolesPermission = () => {
           </div>
         ))}
       </div>
+
+      <CustomRulesModal
+        isOpen={isRulesModalOpen}
+        onClose={() => setIsRulesModalOpen(false)}
+      />
     </div>
   );
 };

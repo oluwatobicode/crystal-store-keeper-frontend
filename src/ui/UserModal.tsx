@@ -1,13 +1,12 @@
-import { X, Loader2, RefreshCw } from "lucide-react"; // Added RefreshCw for generate icon
+import { X, Loader2, RefreshCw } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-// --- 1. Zod Schema ---
 const userSchema = z
   .object({
     fullName: z.string().min(3, "Full Name is required"),
-    username: z.string().email("Username must be a valid email"), // Screenshot implies email format
+    username: z.string().email("Username must be a valid email"),
     role: z.string().min(1, "Please select a role"),
     contactNumber: z.string().optional(),
     password: z.string().min(6, "Password must be at least 6 characters"),
@@ -36,12 +35,12 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
   } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      isActive: true, // Default to Active
+      isActive: true,
       role: "",
     },
   });
 
-  const isActive = watch("isActive"); // Watch state for toggle UI
+  const isActive = watch("isActive");
 
   // --- 2. Generate Password Logic ---
   const generatePassword = () => {
@@ -56,7 +55,7 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
   };
 
   const onSubmit = async (data: UserFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate API
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     console.log("Creating User:", data);
     if (onSave) onSave(data);
     onClose();
@@ -65,7 +64,6 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-[500px] bg-white rounded-[12px] shadow-xl border border-gray-100 flex flex-col max-h-[90vh] overflow-y-auto">
-        {/* --- HEADER --- */}
         <div className="p-[24px] border-b border-[#F4F4F5] flex justify-between items-start">
           <div className="flex flex-col gap-1">
             <h1 className="text-[16px] font-bold uppercase tracking-[0.9px] text-[#1D1D1D]">
@@ -80,12 +78,10 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
           </button>
         </div>
 
-        {/* --- FORM --- */}
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="p-[24px] flex flex-col gap-[20px]"
         >
-          {/* Full Name */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-bold text-[#1D1D1D]">
               Full Name
@@ -102,7 +98,6 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
             )}
           </div>
 
-          {/* Username */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-bold text-[#1D1D1D]">
               Username
@@ -119,7 +114,6 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
             )}
           </div>
 
-          {/* Role Select */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-bold text-[#1D1D1D]">
               Select a role
@@ -141,7 +135,6 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
             )}
           </div>
 
-          {/* Contact Number */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-bold text-[#1D1D1D]">
               Contact Number (Optional)
@@ -153,7 +146,6 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
             />
           </div>
 
-          {/* Password Section */}
           <div className="flex flex-col gap-[8px]">
             <div className="flex justify-between items-center">
               <label className="text-[13px] font-bold text-[#1D1D1D]">
@@ -162,13 +154,13 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
               <button
                 type="button"
                 onClick={generatePassword}
-                className="text-[11px] font-bold text-[#1D1D1D] bg-white border border-[#E2E4E9] px-2 py-1 rounded-[4px] hover:bg-gray-50 flex items-center gap-1"
+                className="text-[11px] cursor-pointer font-bold text-[#1D1D1D] bg-white border border-[#E2E4E9] px-2 py-1 rounded-[4px] hover:bg-gray-50 flex items-center gap-1"
               >
                 <RefreshCw size={10} /> Generate
               </button>
             </div>
             <input
-              type="text" // Visible for UX since it's generated, or "password" if preferred
+              type="text"
               {...register("password")}
               placeholder="Enter password"
               className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none focus:border-[#1A47FE] transition-colors"
@@ -180,7 +172,6 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
             )}
           </div>
 
-          {/* Confirm Password */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-bold text-[#1D1D1D]">
               Confirm Password
@@ -198,7 +189,6 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
             )}
           </div>
 
-          {/* Account Status Toggle */}
           <div className="flex items-center justify-between pt-2">
             <span className="text-[13px] font-bold text-[#1D1D1D]">
               Account Status
@@ -236,19 +226,18 @@ const UserModal = ({ onClose, onSave }: UserModalProps) => {
             </div>
           </div>
 
-          {/* --- FOOTER BUTTONS --- */}
-          <div className="flex justify-end gap-[12px] mt-4 pt-4 border-t border-[#F4F4F5]">
+          <div className="flex justify-end gap-[12px] mt-4 pt-4 ">
             <button
               type="button"
               onClick={onClose}
-              className="h-[40px] px-6 rounded-[8px] border border-[#E2E4E9] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-50 transition-colors"
+              className="h-[40px] cursor-pointer px-6 rounded-[8px] border border-[#E2E4E9] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="h-[40px] px-6 rounded-[8px] bg-[#1A47FE] text-[13px] font-medium text-white hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+              className="h-[40px] cursor-pointer px-6 rounded-[8px] bg-[#1A47FE] text-[13px] font-medium text-white hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
             >
               {isSubmitting ? (
                 <Loader2 className="animate-spin" size={16} />

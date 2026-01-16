@@ -105,7 +105,7 @@ const CustomerModal = ({
             <input
               {...register("fullName")}
               placeholder="Customer name"
-              className="w-full h-[44px] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
+              className="w-full h-[44px] bg-[#F9FAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
             />
             {errors.fullName && (
               <span className="text-red-500 text-[11px]">
@@ -121,7 +121,7 @@ const CustomerModal = ({
             <input
               {...register("emailAddress")}
               placeholder="customer@email.com"
-              className="w-full h-[44px] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
+              className="w-full h-[44px] bg-[#F9FAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
             />
             {errors.emailAddress && (
               <span className="text-red-500 text-[11px]">
@@ -137,7 +137,7 @@ const CustomerModal = ({
             <input
               {...register("phoneNumber")}
               placeholder="Phone number"
-              className="w-full h-[44px] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
+              className="w-full h-[44px] bg-[#F9FAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
             />
             {errors.phoneNumber && (
               <span className="text-red-500 text-[11px]">
@@ -153,7 +153,7 @@ const CustomerModal = ({
             <input
               {...register("address")}
               placeholder="Full address"
-              className="w-full h-[44px] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
+              className="w-full h-[44px] bg-[#F9FAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
             />
             {errors.address && (
               <span className="text-red-500 text-[11px]">
@@ -169,7 +169,7 @@ const CustomerModal = ({
               </label>
               <select
                 {...register("customerType")}
-                className="w-full h-[44px] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none bg-white cursor-pointer"
+                className="w-full h-[44px] bg-[#F9FAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none bg-white cursor-pointer"
               >
                 <option value="Individual">Individual</option>
                 <option value="Company">Company</option>
@@ -183,7 +183,7 @@ const CustomerModal = ({
               <input
                 type="number"
                 {...register("creditLimit")}
-                className="w-full h-[44px] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none "
+                className="w-full h-[44px] bg-[#F9FAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none "
               />
             </div>
           </div>
@@ -199,7 +199,7 @@ const CustomerModal = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="h-[40px] cursor-pointer px-6 rounded-[8px] bg-[#1A47FE] text-[13px] font-medium text-white hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+              className="h-[40px]  cursor-pointer px-6 rounded-[8px] bg-[#1A47FE] text-[13px] font-medium text-white hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
             >
               {isSubmitting ? (
                 <Loader2 className="animate-spin" size={16} />
