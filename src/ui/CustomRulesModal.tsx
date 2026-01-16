@@ -211,7 +211,6 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
     );
   };
 
-  // --- Select All in Section ---
   const toggleSection = (sectionItems: { id: string }[]) => {
     const allIds = sectionItems.map((item) => item.id);
     const allSelected = allIds.every((id) => selectedPermissions.includes(id));
