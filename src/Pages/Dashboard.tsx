@@ -4,7 +4,7 @@ import DashboardRecentTransactions from "../components/dashboard/DashboardRecent
 
 const Dashboard = () => {
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="mx-auto max-w-7xl p-6">
       <DashboardCards />
       <div className="grid grid-cols-2 mt-5 gap-[26px]">
         <DashboardLowStock />

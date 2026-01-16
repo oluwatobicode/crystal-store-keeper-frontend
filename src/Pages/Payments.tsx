@@ -3,7 +3,7 @@ import PaymentsHeader from "../components/payments/PaymentsHeader";
 
 const Payments = () => {
   return (
-    <div className="">
+    <div className="p-6">
       <PaymentsHeader />
       <AllPayments />
     </div>

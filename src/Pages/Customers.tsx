@@ -112,7 +112,7 @@ const Customers = () => {
   };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-10">
+    <div className="mx-auto max-w-7xl space-y-10 p-6">
       <CustomerData onAddClick={handleAddNew} />
       <AllCustomers
         customers={customers}

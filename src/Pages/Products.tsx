@@ -3,7 +3,7 @@ import ProductsTabs from "../components/products/ProductsTabs";
 
 const Products = () => {
   return (
-    <div>
+    <div className="p-6">
       <ProductsHeader />
       <ProductsTabs />
     </div>
