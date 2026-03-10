@@ -7,6 +7,7 @@ type UpdateCustomerData = Partial<CreateCustomerData>;
 export const useCustomers = () => {
   const queryClient = useQueryClient();
 
+  //   getting all customers
   const allCustomers = useQuery({
     queryKey: ["allCustomers"],
     queryFn: async () =>
