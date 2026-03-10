@@ -1,5 +1,6 @@
 import { X, Mail, Phone, MapPin, Calendar, ShoppingCart } from "lucide-react";
-import { type Customer } from "../Pages/Customers";
+import type { Customer } from "../types/Customers";
+import { formatCurrency } from "../utils/formatCurrency";
 
 interface CustomerDetailsProps {
   isOpen: boolean;
@@ -15,14 +16,11 @@ const CustomerModalDetails = ({
   if (!isOpen || !customer) return null;
 
   const mockDetails = {
-    type: "Business",
-    creditLimit: "£1,000",
-    currentBalance: "£0.00",
     recentTransactions: [
-      { id: "INV-001", items: 3, amount: "£245.50", date: "1/14/2024" },
-      { id: "INV-001", items: 3, amount: "£245.50", date: "1/14/2024" },
-      { id: "INV-001", items: 3, amount: "£245.50", date: "1/14/2024" },
-      { id: "INV-001", items: 3, amount: "£245.50", date: "1/14/2024" },
+      { id: "INV-001", items: 3, amount: "₦245.50", date: "1/14/2024" },
+      { id: "INV-001", items: 3, amount: "₦245.50", date: "1/14/2024" },
+      { id: "INV-001", items: 3, amount: "₦245.50", date: "1/14/2024" },
+      { id: "INV-001", items: 3, amount: "₦245.50", date: "1/14/2024" },
     ],
   };
 
@@ -33,10 +31,10 @@ const CustomerModalDetails = ({
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
               <h1 className="text-[18px] font-bold uppercase tracking-[0.9px] text-[#1D1D1D]">
-                {customer.name}
+                {customer.fullname}
               </h1>
               <span className="bg-[#1A47FE] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
-                {mockDetails.type}
+                {customer.customerType}
               </span>
             </div>
             <p className="text-[13px] text-[#71717A] font-medium">
@@ -60,18 +58,18 @@ const CustomerModalDetails = ({
               <div className="flex flex-col gap-[12px]">
                 <div className="flex items-center gap-3 text-[#1D1D1D] text-[13px] font-medium">
                   <Mail size={16} className="text-[#71717A]" />
-                  {customer.email}
+                  {customer.email || "N/A"}
                 </div>
                 <div className="flex items-center gap-3 text-[#1D1D1D] text-[13px] font-medium">
                   <Phone size={16} className="text-[#71717A]" />
-                  {customer.number}
+                  {customer.phone || "N/A"}
                 </div>
                 <div className="flex items-start gap-3 text-[#1D1D1D] text-[13px] font-medium">
                   <MapPin
                     size={16}
                     className="text-[#71717A] mt-0.5 shrink-0"
                   />
-                  {customer.location}
+                  {customer.address || "N/A"}
                 </div>
               </div>
             </div>
@@ -86,15 +84,15 @@ const CustomerModalDetails = ({
                     Total Spent
                   </span>
                   <span className="text-[#1D1D1D] font-bold">
-                    {customer.totalSpent}
+                    {formatCurrency(customer.totalSpent)}
                   </span>
                 </div>
                 <div className="flex justify-between text-[13px]">
                   <span className="text-[#71717A] font-medium">
-                    Transactions
+                    Customer Type
                   </span>
-                  <span className="text-[#1D1D1D] font-bold">
-                    {customer.transactions}
+                  <span className="text-[#1D1D1D] font-bold capitalize">
+                    {customer.customerType}
                   </span>
                 </div>
                 <div className="flex justify-between text-[13px]">
@@ -102,7 +100,7 @@ const CustomerModalDetails = ({
                     Credit Limit
                   </span>
                   <span className="text-[#1D1D1D] font-bold">
-                    {mockDetails.creditLimit}
+                    {formatCurrency(customer.creditLimit)}
                   </span>
                 </div>
                 <div className="h-[1px] bg-[#F4F4F5] my-1" />
@@ -111,7 +109,7 @@ const CustomerModalDetails = ({
                     Current Balance
                   </span>
                   <span className="text-[#1D1D1D] font-bold">
-                    {mockDetails.currentBalance}
+                    {formatCurrency(customer.currentBalance)}
                   </span>
                 </div>
               </div>
