@@ -39,5 +39,23 @@ export const useUsers = () => {
     },
   });
 
-  return { allUsers, createUser, deleteUser };
+  const updateUser = useMutation({
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<UsersData>;
+    }) => {
+      const response = await api.patch(`/users/${id}`, data, {
+        withCredentials: true,
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allUsers"] });
+    },
+  });
+
+  return { allUsers, createUser, deleteUser, updateUser };
 };

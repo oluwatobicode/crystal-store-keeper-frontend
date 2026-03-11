@@ -44,7 +44,47 @@ export const useProducts = () => {
       }),
   });
 
-  return { allProducts, lowStockProducts, createProduct };
+  // receive stock
+  const receiveStock = useMutation({
+    mutationFn: async (data: {
+      productId: string;
+      quantity: number;
+      supplierId: string;
+      notes?: string;
+    }) =>
+      await api.post("/inventory/receive", data, {
+        withCredentials: true,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allProducts"] });
+      queryClient.invalidateQueries({ queryKey: ["low-stock-products"] });
+    },
+  });
+
+  // adjust stock
+  const adjustStock = useMutation({
+    mutationFn: async (data: {
+      productId: string;
+      adjustmentType: string;
+      quantityChange: number;
+      reason: string;
+    }) =>
+      await api.post("/inventory/adjust", data, {
+        withCredentials: true,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allProducts"] });
+      queryClient.invalidateQueries({ queryKey: ["low-stock-products"] });
+    },
+  });
+
+  return {
+    allProducts,
+    lowStockProducts,
+    createProduct,
+    receiveStock,
+    adjustStock,
+  };
 };
 
 export const useProduct = (id: string) => {

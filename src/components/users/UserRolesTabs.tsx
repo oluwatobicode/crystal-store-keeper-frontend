@@ -18,12 +18,9 @@ type userTabType = (typeof userSection)[number]["tab"];
 const UserRolesTabs = () => {
   const [currentTab, setCurrentTab] = useState<userTabType>("User Management");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
-  // Delete modal state
   const [userToDelete, setUserToDelete] = useState<UsersData | null>(null);
-
-  // View details modal state
   const [viewUser, setViewUser] = useState<UsersData | null>(null);
+  const [userToEdit, setUserToEdit] = useState<UsersData | null>(null);
 
   const { deleteUser } = useUsers();
 
@@ -46,6 +43,11 @@ const UserRolesTabs = () => {
     setViewUser(user);
   };
 
+  const handleEditClick = (user: UsersData) => {
+    setUserToEdit(user);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="flex flex-col  gap-[24px]">
       <div className="w-full px-2 bg-[#EDEDE4]/20 bg-opacity-20 rounded-[12px] h-[41px] flex items-center gap-[25px]">
@@ -66,21 +68,25 @@ const UserRolesTabs = () => {
 
       {currentTab === "User Management" && (
         <AllUsers
-          onAddUserClick={() => setIsModalOpen(true)}
+          onAddUserClick={() => {
+            setUserToEdit(null);
+            setIsModalOpen(true);
+          }}
+          onEditClick={handleEditClick}
           onDeleteClick={handleDeleteClick}
           onViewClick={handleViewClick}
         />
       )}
       {currentTab === "Roles & Permission" && <RolesPermission />}
 
-      {isModalOpen && (
-        <UserModal
-          onClose={() => setIsModalOpen(false)}
-          onSave={(data) => {
-            console.log("Saved:", data);
-          }}
-        />
-      )}
+      <UserModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setUserToEdit(null);
+        }}
+        userToEdit={userToEdit}
+      />
 
       <DeleteUserModal
         isOpen={!!userToDelete}

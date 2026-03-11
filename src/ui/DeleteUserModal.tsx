@@ -27,7 +27,7 @@ const DeleteUserModal = ({
             </div>
             <div className="flex flex-col gap-0.5">
               <h1 className="text-[16px] font-bold uppercase tracking-[0.9px] text-[#1D1D1D]">
-                Delete User
+                Delete User ?
               </h1>
               <p className="text-[13px] text-[#71717A] font-medium">
                 This action cannot be undone

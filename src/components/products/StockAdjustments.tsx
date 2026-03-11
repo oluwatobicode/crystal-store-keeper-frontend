@@ -1,36 +1,94 @@
-import { Search, ChevronDown, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { useProducts } from "../../hooks/useProducts";
+import toast from "react-hot-toast";
 
 type StockAdjustmentFormData = {
   productId: string;
-  adjustmentType: "add" | "deduct" | "correction" | "";
-  quantity: string;
+  adjustmentType: string;
+  quantityChange: string;
   reason: string;
 };
 
+interface Product {
+  _id: string;
+  name: string;
+  currentStock: number;
+}
+
 const StockAdjustments = () => {
+  const { allProducts, adjustStock } = useProducts();
+  const products: Product[] = allProducts?.data?.data?.data || [];
+
+  const [productSearch, setProductSearch] = useState("");
+  const [showProductDropdown, setShowProductDropdown] = useState(false);
+
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<StockAdjustmentFormData>({
     defaultValues: {
       productId: "",
       adjustmentType: "",
-      quantity: "",
+      quantityChange: "",
       reason: "",
     },
   });
 
-  const onSubmit = async (data: StockAdjustmentFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Adjustment Submitted:", {
-      ...data,
-      quantity: parseInt(data.quantity, 10),
-    });
-    reset();
+  const selectedProductId = watch("productId");
+  const selectedProduct = products.find((p) => p._id === selectedProductId);
+
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(productSearch.toLowerCase()),
+  );
+
+  const handleSelectProduct = (product: Product) => {
+    setValue("productId", product._id);
+    setProductSearch(product.name);
+    setShowProductDropdown(false);
   };
+
+  const onSubmit = async (data: StockAdjustmentFormData) => {
+    const qty = parseInt(data.quantityChange, 10);
+    // For deductions (damage, lost), send negative quantity
+    const quantityChange =
+      data.adjustmentType === "damage" ||
+      data.adjustmentType === "theft" ||
+      data.adjustmentType === "supplier_return"
+        ? -Math.abs(qty)
+        : Math.abs(qty);
+
+    try {
+      const response = await adjustStock.mutateAsync({
+        productId: data.productId,
+        adjustmentType: data.adjustmentType,
+        quantityChange,
+        reason: data.reason,
+      });
+
+      const updatedProduct = response?.data?.data?.product;
+      toast.success(
+        `Stock adjusted! ${updatedProduct?.name || "Product"} new stock: ${updatedProduct?.currentStock ?? "N/A"}`,
+      );
+      reset();
+      setProductSearch("");
+    } catch {
+      toast.error("Failed to adjust stock");
+    }
+  };
+
+  if (allProducts.isLoading) {
+    return (
+      <div className="bg-white border border-[#E2E4E9] rounded-[12px] p-[24px] flex items-center justify-center py-16">
+        <Loader2 className="animate-spin text-[#71717A]" size={30} />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white border border-[#E2E4E9] rounded-[12px] p-[24px] flex flex-col gap-[32px]">
@@ -42,31 +100,64 @@ const StockAdjustments = () => {
 
       <div className="flex flex-col gap-[24px]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
+          {/* Product search dropdown */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-medium text-[#1D1D1D] tracking-[0.5px]">
               Product
             </label>
             <div className="relative">
-              <Search
-                size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]"
-              />
               <input
                 type="text"
+                value={productSearch}
+                onChange={(e) => {
+                  setProductSearch(e.target.value);
+                  setShowProductDropdown(true);
+                  if (!e.target.value) setValue("productId", "");
+                }}
+                onFocus={() => setShowProductDropdown(true)}
                 placeholder="Search product..."
+                className="w-full h-[44px] bg-white border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
+              />
+              <input
+                type="hidden"
                 {...register("productId", {
                   required: "Please select a product",
                 })}
-                className="w-full h-[44px] bg-white border border-[#E2E4E9] rounded-[8px] pl-9 pr-3 text-[13px] outline-none  transition-colors"
               />
+
+              {showProductDropdown && filteredProducts.length > 0 && (
+                <div className="absolute z-10 top-[48px] left-0 w-full bg-white border border-[#E2E4E9] rounded-[8px] shadow-lg max-h-[200px] overflow-y-auto">
+                  {filteredProducts.map((product) => (
+                    <button
+                      key={product._id}
+                      type="button"
+                      onClick={() => handleSelectProduct(product)}
+                      className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-[#FAFAFB] transition-colors flex items-center justify-between"
+                    >
+                      <span className="font-medium text-[#1D1D1D]">
+                        {product.name}
+                      </span>
+                      <span className="text-[11px] text-[#71717A]">
+                        Stock: {product.currentStock}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             {errors.productId && (
               <span className="text-red-500 text-[11px]">
                 {errors.productId.message}
               </span>
             )}
+            {selectedProduct && (
+              <p className="text-[11px] text-[#71717A]">
+                Current stock: {selectedProduct.currentStock} units
+              </p>
+            )}
           </div>
 
+          {/* Adjustment Type */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-medium text-[#1D1D1D] tracking-[0.5px]">
               Adjustment Type
@@ -76,12 +167,15 @@ const StockAdjustments = () => {
                 {...register("adjustmentType", {
                   required: "Select adjustment type",
                 })}
-                className="w-full h-[44px] cursor-pointer bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] text-[#71717A] appearance-none outline-none  transition-colors"
+                className="w-full h-[44px] cursor-pointer bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] text-[#71717A] appearance-none outline-none transition-colors"
               >
                 <option value="">Select type</option>
-                <option value="add">Stock In (Found/Return)</option>
-                <option value="deduct">Stock Out (Damaged/Lost)</option>
-                <option value="correction">Correction (Audit)</option>
+                <option value="initial_count">Initial Count (Restock)</option>
+                <option value="return">Customer Return</option>
+                <option value="damage">Damage (Loss)</option>
+                <option value="theft">Theft (Loss)</option>
+                <option value="supplier_return">Supplier Return</option>
+                <option value="correction">Audit Correction</option>
               </select>
               <ChevronDown
                 size={16}
@@ -95,36 +189,33 @@ const StockAdjustments = () => {
             )}
           </div>
 
+          {/* Quantity */}
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-medium text-[#1D1D1D] tracking-[0.5px]">
-              Quantity Change
+              Quantity
             </label>
             <input
               type="number"
-              placeholder="+/- quantity"
-              {...register("quantity", {
+              min="1"
+              placeholder="Enter quantity"
+              {...register("quantityChange", {
                 required: "Quantity is required",
                 min: {
                   value: 1,
                   message: "Quantity must be at least 1",
                 },
-                validate: (value) => {
-                  const num = parseInt(value, 10);
-                  if (isNaN(num)) return "Must be a valid number";
-                  if (!Number.isInteger(num)) return "Must be a whole number";
-                  return true;
-                },
               })}
-              className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none  transition-colors placeholder:text-[#A1A1AA]"
+              className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors placeholder:text-[#A1A1AA]"
             />
-            {errors.quantity && (
+            {errors.quantityChange && (
               <span className="text-red-500 text-[11px]">
-                {errors.quantity.message}
+                {errors.quantityChange.message}
               </span>
             )}
           </div>
         </div>
 
+        {/* Reason */}
         <div className="flex flex-col gap-[8px]">
           <label className="text-[13px] font-medium text-[#1D1D1D] tracking-[0.5px]">
             Reason
@@ -139,7 +230,7 @@ const StockAdjustments = () => {
                 message: "Please provide a valid reason (min 5 chars)",
               },
             })}
-            className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none  transition-colors placeholder:text-[#A1A1AA]"
+            className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors placeholder:text-[#A1A1AA]"
           />
           {errors.reason && (
             <span className="text-red-500 text-[11px]">

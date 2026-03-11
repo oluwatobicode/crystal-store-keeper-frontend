@@ -22,3 +22,8 @@ export interface CreateCustomerData {
   customerType: string;
   creditLimit: number;
 }
+
+export interface AllCustomersProps {
+  onEditClick: (customer: Customer) => void;
+  onViewClick: (customer: Customer) => void;
+}

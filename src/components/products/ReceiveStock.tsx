@@ -1,85 +1,94 @@
 import { useState } from "react";
-import { Plus, Search, ChevronDown, Trash2, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useProducts } from "../../hooks/useProducts";
+import { useSuppliers } from "../../hooks/useSuppliers";
+import toast from "react-hot-toast";
 
 const ReceiveStockSchema = z.object({
+  productId: z.string().min(1, "Please select a product"),
   supplierId: z.string().min(1, "Please select a supplier"),
-  invoiceRef: z.string().min(1, "Invoice reference is required"),
+  quantity: z.string().min(1, "Quantity is required"),
+  notes: z.string().optional(),
 });
 
 type ReceiveStockFormData = z.infer<typeof ReceiveStockSchema>;
 
-interface StockItem {
-  id: string;
-  productName: string;
-  quantity: number;
-  cost: number;
+interface Product {
+  _id: string;
+  name: string;
+  currentStock: number;
+}
+
+interface Supplier {
+  _id: string;
+  name: string;
 }
 
 const ReceiveStock = () => {
-  const [items, setItems] = useState<StockItem[]>([]);
-  const [newItem, setNewItem] = useState({ name: "", qty: "", cost: "" });
+  const { allProducts, receiveStock } = useProducts();
+  const { allSuppliers } = useSuppliers();
+
+  const products: Product[] = allProducts?.data?.data?.data || [];
+  const suppliers: Supplier[] = allSuppliers?.data?.data?.data || [];
+
+  const [productSearch, setProductSearch] = useState("");
+  const [showProductDropdown, setShowProductDropdown] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setValue,
+    watch,
   } = useForm<ReceiveStockFormData>({
     resolver: zodResolver(ReceiveStockSchema),
   });
 
-  const handleAddItem = (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent form submit
-    if (!newItem.name || !newItem.qty || !newItem.cost) return;
+  const selectedProductId = watch("productId");
+  const selectedProduct = products.find((p) => p._id === selectedProductId);
 
-    const item: StockItem = {
-      id: Math.random().toString(36).substr(2, 9),
-      productName: newItem.name,
-      quantity: parseInt(newItem.qty),
-      cost: parseFloat(newItem.cost),
-    };
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(productSearch.toLowerCase()),
+  );
 
-    setItems([...items, item]);
-    setNewItem({ name: "", qty: "", cost: "" });
+  const handleSelectProduct = (product: Product) => {
+    setValue("productId", product._id);
+    setProductSearch(product.name);
+    setShowProductDropdown(false);
   };
 
-  const handleRemoveItem = (id: string) => {
-    setItems(items.filter((item) => item.id !== id));
-  };
-
-  // 3. Final Submission (Axios)
   const onSubmit = async (data: ReceiveStockFormData) => {
-    if (items.length === 0) {
-      alert("Please add at least one product to the list.");
-      return;
-    }
-
     try {
-      // Construct the final payload
-      const payload = {
-        ...data, // supplierId, invoiceRef
-        items: items, // The array of products
-        totalValue: items.reduce(
-          (acc, curr) => acc + curr.quantity * curr.cost,
-          0
-        ),
-      };
+      const response = await receiveStock.mutateAsync({
+        productId: data.productId,
+        quantity: parseInt(data.quantity, 10),
+        supplierId: data.supplierId,
+        notes: data.notes || "",
+      });
 
-      console.log("Submitting Payload:", payload);
-
-      // Real Axios call (Commented out for demo)
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const result = response?.data?.data;
+      toast.success(
+        `Received ${data.quantity} units of ${result?.product?.name || "product"} (Stock: ${result?.movement?.stockBefore} → ${result?.movement?.stockAfter})`,
+      );
 
       reset();
-      setItems([]);
-    } catch (error) {
-      console.error("Submission error:", error);
-      alert("Failed to save stock.");
+      setProductSearch("");
+    } catch {
+      toast.error("Failed to receive stock");
     }
   };
+
+  if (allProducts.isLoading || allSuppliers.isLoading) {
+    return (
+      <div className="bg-white border border-[#E2E4E9] rounded-[12px] p-[24px] flex items-center justify-center py-16">
+        <Loader2 className="animate-spin text-[#71717A]" size={30} />
+      </div>
+    );
+  }
 
   return (
     <form
@@ -93,6 +102,59 @@ const ReceiveStock = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-[24px]">
+        {/* Product selector */}
+        <div className="flex flex-col gap-[8px]">
+          <label className="text-[13px] font-medium text-[#1D1D1D] tracking-[0.5px]">
+            Product
+          </label>
+          <div className="relative w-full">
+            <input
+              type="text"
+              value={productSearch}
+              onChange={(e) => {
+                setProductSearch(e.target.value);
+                setShowProductDropdown(true);
+                if (!e.target.value) setValue("productId", "");
+              }}
+              onFocus={() => setShowProductDropdown(true)}
+              placeholder="Search product..."
+              className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
+            />
+            <input type="hidden" {...register("productId")} />
+
+            {showProductDropdown && filteredProducts.length > 0 && (
+              <div className="absolute z-10 top-[48px] left-0 w-full bg-white border border-[#E2E4E9] rounded-[8px] shadow-lg max-h-[200px] overflow-y-auto">
+                {filteredProducts.map((product) => (
+                  <button
+                    key={product._id}
+                    type="button"
+                    onClick={() => handleSelectProduct(product)}
+                    className="w-full text-left px-4 py-2.5 text-[13px] hover:bg-[#FAFAFB] transition-colors flex items-center justify-between"
+                  >
+                    <span className="font-medium text-[#1D1D1D]">
+                      {product.name}
+                    </span>
+                    <span className="text-[11px] text-[#71717A]">
+                      Stock: {product.currentStock}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          {errors.productId && (
+            <span className="text-red-500 text-[11px]">
+              {errors.productId.message}
+            </span>
+          )}
+          {selectedProduct && (
+            <p className="text-[11px] text-[#71717A]">
+              Current stock: {selectedProduct.currentStock} units
+            </p>
+          )}
+        </div>
+
+        {/* Supplier selector */}
         <div className="flex flex-col gap-[8px]">
           <label className="text-[13px] font-medium text-[#1D1D1D] tracking-[0.5px]">
             Supplier
@@ -100,11 +162,14 @@ const ReceiveStock = () => {
           <div className="relative w-full">
             <select
               {...register("supplierId")}
-              className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] text-[#71717A] appearance-none outline-none  transition-colors cursor-pointer"
+              className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] text-[#71717A] appearance-none outline-none transition-colors cursor-pointer"
             >
               <option value="">Select supplier</option>
-              <option value="s1">Dulux Paints Ltd</option>
-              <option value="s2">Crown Supplies</option>
+              {suppliers.map((s) => (
+                <option key={s._id} value={s._id}>
+                  {s.name}
+                </option>
+              ))}
             </select>
             <ChevronDown
               size={16}
@@ -117,141 +182,52 @@ const ReceiveStock = () => {
             </span>
           )}
         </div>
+      </div>
 
+      <div className="grid grid-cols-2 gap-[24px]">
+        {/* Quantity */}
         <div className="flex flex-col gap-[8px]">
           <label className="text-[13px] font-medium text-[#1D1D1D] tracking-[0.5px]">
-            Supplier Invoice Ref
+            Quantity
           </label>
           <input
-            type="text"
-            placeholder="INV-2024-001"
-            {...register("invoiceRef")}
-            className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none  transition-colors placeholder:text-[#A1A1AA]"
+            type="number"
+            min="1"
+            placeholder="Enter quantity"
+            {...register("quantity")}
+            className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors placeholder:text-[#A1A1AA]"
           />
-          {errors.invoiceRef && (
+          {errors.quantity && (
             <span className="text-red-500 text-[11px]">
-              {errors.invoiceRef.message}
+              {errors.quantity.message}
             </span>
           )}
         </div>
-      </div>
 
-      <div className="flex flex-col gap-[8px]">
-        <label className="text-[13px] font-medium text-[#1D1D1D] tracking-[0.5px]">
-          Add Products
-        </label>
-        <div className="flex items-end gap-[16px]">
-          <div className="flex-1 relative">
-            <Search
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]"
-            />
-            <input
-              type="text"
-              value={newItem.name}
-              onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-              placeholder="Search product..."
-              className="w-full h-[44px] bg-white border border-[#E2E4E9] rounded-[8px] pl-9 pr-3 text-[13px] outline-none transition-colors"
-            />
-          </div>
-
-          <div className="w-[120px]">
-            <input
-              type="number"
-              value={newItem.qty}
-              onChange={(e) => setNewItem({ ...newItem, qty: e.target.value })}
-              placeholder="Quantity"
-              className="w-full h-[44px] bg-white border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
-            />
-          </div>
-
-          <div className="w-[140px]">
-            <input
-              type="number"
-              value={newItem.cost}
-              onChange={(e) => setNewItem({ ...newItem, cost: e.target.value })}
-              placeholder="Purchase cost"
-              className="w-full h-[44px] bg-white border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors"
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={handleAddItem}
-            className="h-[44px] cursor-pointer px-6 bg-[#1A47FE] hover:bg-blue-700 text-white rounded-[8px] text-[13px] font-medium transition-colors flex items-center justify-center shrink-0"
-          >
-            <Plus size={16} className="mr-2" />
-            Add Item
-          </button>
+        {/* Notes */}
+        <div className="flex flex-col gap-[8px]">
+          <label className="text-[13px] font-medium text-[#1D1D1D] tracking-[0.5px]">
+            Notes (optional)
+          </label>
+          <input
+            type="text"
+            placeholder="e.g. New shipment arrival"
+            {...register("notes")}
+            className="w-full h-[44px] bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] px-3 text-[13px] outline-none transition-colors placeholder:text-[#A1A1AA]"
+          />
         </div>
       </div>
 
-      {items.length === 0 ? (
-        <div className="w-full h-[200px] border-t border-[#E2E4E9]  flex flex-col items-center justify-center gap-[12px]">
-          <div className="text-center">
-            <p className="text-[13px] font-medium text-[#1D1D1D]">
-              No items added yet
-            </p>
-            <p className="text-[12px] text-[#71717A]">
-              Search and add products to receive stock
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div className="w-full overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-[#E1E4EA]">
-                {["Product", "Qty", "Cost", "Total", "Action"].map((head) => (
-                  <th
-                    key={head}
-                    className="py-4 text-xs font-medium text-[#71717A] tracking-wider uppercase"
-                  >
-                    {head}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#E2E4E9]">
-              {items.map((item) => (
-                <tr
-                  key={item.id}
-                  className="group hover:bg-[#FAFAFB] transition-colors"
-                >
-                  <td className="py-4 pr-4 text-[13px] font-medium text-[#1D1D1D] tracking-normal">
-                    {item.productName}
-                  </td>
-                  <td className="py-4 pr-4 text-[13px] font-medium text-[#1D1D1D] tracking-normal">
-                    {item.quantity}
-                  </td>
-                  <td className="py-4 pr-4 text-[13px] font-medium text-[#1D1D1D] tracking-normal">
-                    ₦{item.cost.toLocaleString()}
-                  </td>
-                  <td className="py-4 pr-4 text-[13px] font-medium text-[#1D1D1D] tracking-normal">
-                    ₦{(item.quantity * item.cost).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveItem(item.id)}
-                      className="text-red-500 cursor-pointer hover:text-red-700"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      <div className="flex justify-end gap-[12px] mt-4 pt-4 border-t border-[#F4F4F5]">
+      <div className="flex justify-end gap-[12px] pt-4 border-t border-[#F4F4F5]">
         <button
           type="button"
+          onClick={() => {
+            reset();
+            setProductSearch("");
+          }}
           className="h-[40px] px-6 cursor-pointer bg-white border border-[#E2E4E9] rounded-[8px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-50 transition-colors"
         >
-          Save Draft
+          Clear
         </button>
         <button
           type="submit"
@@ -259,7 +235,7 @@ const ReceiveStock = () => {
           className="h-[40px] px-6 cursor-pointer bg-[#2474F5] text-white rounded-[8px] text-[13px] font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
         >
           {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : null}
-          Complete Delivery
+          Receive Stock
         </button>
       </div>
     </form>

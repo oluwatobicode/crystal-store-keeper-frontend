@@ -148,7 +148,7 @@ export const permissionsSections = [
     key: "users",
     items: [
       {
-        id: "user.manage",
+        id: "users.manage",
         label: "Manage Users",
         desc: "Create, edit, and deactivate user accounts",
       },

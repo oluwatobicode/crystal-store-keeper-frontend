@@ -1,4 +1,5 @@
 import {
+  ChevronDown,
   EyeIcon,
   Loader2,
   PlusIcon,
@@ -6,32 +7,28 @@ import {
   SquarePen,
   Trash2,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { getStatusColor } from "../../utils/getStatusColor";
 import { useUsers } from "../../hooks/useUsers";
-import type { UsersData } from "../../types/User";
+import type { AllUsersProps, UsersData } from "../../types/User";
 import { formatDate } from "../../utils/formatDate";
 import { formatUserId } from "../../utils/formatUserId";
 
-interface AllUsersProps {
-  onAddUserClick: () => void;
-  onDeleteClick: (user: UsersData) => void;
-  onViewClick: (user: UsersData) => void;
-}
-
 const AllUsers = ({
   onAddUserClick,
+  onEditClick,
   onDeleteClick,
   onViewClick,
 }: AllUsersProps) => {
-  const { allUsers } = useUsers();
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
+  const { allUsers } = useUsers();
   const isLoading = allUsers?.isLoading;
   const userResponse = allUsers?.data?.data;
   const { data: allUser } = userResponse || {};
 
-  // Toast on successful fetch
   const hasToasted = useRef(false);
   useEffect(() => {
     if (userResponse?.message && !hasToasted.current) {
@@ -39,6 +36,30 @@ const AllUsers = ({
       hasToasted.current = true;
     }
   }, [userResponse]);
+
+  const filteredRoles = useMemo(() => {
+    if (!allUser) return [];
+    let result = allUser;
+
+    if (statusFilter !== "all") {
+      result = result.filter(
+        (e: UsersData) => e.status?.toLowerCase() === statusFilter,
+      );
+    }
+
+    if (searchQuery.trim()) {
+      const term = searchQuery.toLowerCase();
+      result = result.filter(
+        (e: UsersData) =>
+          e.fullname?.toLowerCase().includes(term) ||
+          e.email?.toLowerCase().includes(term) ||
+          e.username?.toLowerCase().includes(term) ||
+          e.role.roleName.toLowerCase().includes(term),
+      );
+    }
+
+    return result;
+  }, [searchQuery, statusFilter, allUser]);
 
   return (
     <div className="flex flex-col w-full gap-[17px] px-[24px] h-auto py-[24px] bg-white">
@@ -65,13 +86,28 @@ const AllUsers = ({
           <Search className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-400 pointer-events-none" />
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search Users"
             className="h-[43px] bg-white w-full rounded-[11.31px] border border-[#E4E4E7] pl-10 pr-4 outline-none transition-colors focus:border-gray-400 text-[14px]"
           />
         </div>
 
-        <div className="w-[170px] h-[43px] bg-white flex items-center justify-center rounded-[8px] border border-[#E4E4E7] cursor-pointer hover:bg-gray-50 text-[14px] text-[#71717A] font-medium">
-          <h2>All Status</h2>
+        <div className="relative w-[170px]">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full h-[43px] bg-white rounded-[8px] border border-[#E4E4E7] px-4 pr-9 text-[14px] text-[#71717A] font-medium outline-none appearance-none cursor-pointer transition-colors focus:border-gray-400"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="suspended">Suspended</option>
+          </select>
+          <ChevronDown
+            size={16}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A] pointer-events-none"
+          />
         </div>
       </div>
 
@@ -119,7 +155,7 @@ const AllUsers = ({
               </td>
             </tr>
           ) : (
-            allUser.map((user: UsersData) => (
+            filteredRoles.map((user: UsersData) => (
               <tr key={user._id}>
                 <td className="p-4 text-xs font-medium text-[#1D1D1D] tracking-wider">
                   {formatUserId(user._id)}
@@ -131,7 +167,7 @@ const AllUsers = ({
                   {user.username}
                 </td>
                 <td className="p-4 text-xs font-medium text-[#1D1D1D] tracking-wider">
-                  {user.role.roleName}
+                  {user.role?.roleName}
                 </td>
                 <td
                   className={`p-4 text-xs font-medium tracking-wider ${getStatusColor(
@@ -150,6 +186,7 @@ const AllUsers = ({
                     <SquarePen
                       size={18}
                       className="cursor-pointer hover:text-blue-600 transition-colors"
+                      onClick={() => onEditClick(user)}
                     />
                     <EyeIcon
                       size={18}

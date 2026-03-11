@@ -10,6 +10,7 @@ import UserRoles from "./Pages/UserRoles";
 import ProtectedRoutes from "./ui/ProtectedRoutes";
 import AppLayout from "./ui/AppLayout";
 import Products from "./Pages/Products";
+import Suppliers from "./Pages/Suppliers";
 import { AuthProvider } from "./contexts/AuthProvider";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -41,6 +42,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/sales" element={<Sales />} />
               <Route path="/products" element={<Products />} />
+              <Route path="/suppliers" element={<Suppliers />} />
               <Route path="/customers" element={<Customers />} />
               <Route path="/transactions" element={<Payments />} />
               <Route path="/reports" element={<Reports />} />

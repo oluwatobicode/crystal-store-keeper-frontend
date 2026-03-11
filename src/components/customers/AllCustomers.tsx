@@ -2,36 +2,44 @@ import { Loader2, MapPin, Phone, Search, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 import { MdEmail } from "react-icons/md";
 import { useCustomers } from "../../hooks/useCustomers";
-import type { Customer } from "../../types/Customers";
+import type { AllCustomersProps, Customer } from "../../types/Customers";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { formatDate } from "../../utils/formatDate";
 
-interface AllCustomersProps {
-  onEditClick: (customer: Customer) => void;
-  onViewClick: (customer: Customer) => void;
-}
-
 const AllCustomers = ({ onEditClick, onViewClick }: AllCustomersProps) => {
-  const { allCustomers } = useCustomers();
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
+  const { allCustomers } = useCustomers();
   const isLoading = allCustomers?.isLoading;
   const customersResponse = allCustomers?.data?.data;
   const { data: customers } = customersResponse || {};
 
   const filteredCustomers = useMemo(() => {
     if (!customers) return [];
-    if (!searchTerm.trim()) return customers;
-    const term = searchTerm.toLowerCase();
-    return customers.filter(
-      (c: Customer) =>
-        c.fullname?.toLowerCase().includes(term) ||
-        c.email?.toLowerCase().includes(term) ||
-        c.phone?.toLowerCase().includes(term) ||
-        c.address?.toLowerCase().includes(term) ||
-        c.customerId?.toLowerCase().includes(term),
-    );
-  }, [customers, searchTerm]);
+    let results = customers;
+
+    if (statusFilter !== "all") {
+      results = results.filter(
+        (e: Customer) =>
+          e.customerType.toLowerCase() === statusFilter.toLowerCase(),
+      );
+    }
+
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      results = results.filter(
+        (c: Customer) =>
+          c.fullname?.toLowerCase().includes(term) ||
+          c.email?.toLowerCase().includes(term) ||
+          c.phone?.toLowerCase().includes(term) ||
+          c.address?.toLowerCase().includes(term) ||
+          c.customerId?.toLowerCase().includes(term),
+      );
+    }
+
+    return results;
+  }, [customers, searchTerm, statusFilter]);
 
   return (
     <div className="flex flex-col gap-[13px] px-0 py-0">
@@ -48,7 +56,15 @@ const AllCustomers = ({ onEditClick, onViewClick }: AllCustomersProps) => {
         </div>
 
         <div className="w-[170px] h-[43px] bg-white flex items-center justify-center rounded-[8px] text-[14px] text-[#71717A]">
-          <h2>All Customer Types</h2>
+          <select
+            className="w-full h-[43px] bg-white rounded-[8px] border border-[#E4E4E7] px-4 pr-9 text-[14px] text-[#71717A] font-medium outline-none appearance-none cursor-pointer transition-colors focus:border-gray-400"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All</option>
+            <option value="individual">Individual</option>
+            <option value="business">Business</option>
+          </select>
         </div>
       </div>
 

@@ -5,12 +5,61 @@ import {
   Clock,
   AlertTriangle,
   Info,
+  Loader2,
 } from "lucide-react";
-import { useState } from "react";
+import { useSettings } from "../../hooks/useSettings";
+import api from "../../api/api";
+import toast from "react-hot-toast";
+
+const exportCsv = async (endpoint: string, filename: string) => {
+  try {
+    const response = await api.get(endpoint, {
+      withCredentials: true,
+      responseType: "blob",
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+    toast.success(`${filename} exported successfully`);
+  } catch {
+    toast.error("Failed to export data");
+  }
+};
 
 const BackupSettings = () => {
-  const [autoBackup, setAutoBackup] = useState(false);
-  const [cloudSync, setCloudSync] = useState(false);
+  const { getSettings, updateSettings } = useSettings();
+  const settingsData = getSettings?.data?.data?.data;
+  const backup = settingsData?.backup;
+
+  const handleToggleAutoBackup = async () => {
+    try {
+      await updateSettings.mutateAsync({
+        backup: {
+          scheduleEnabled: !backup?.scheduleEnabled,
+        },
+      });
+      toast.success(
+        backup?.scheduleEnabled
+          ? "Automatic backups disabled"
+          : "Automatic backups enabled",
+      );
+    } catch {
+      toast.error("Failed to update backup settings");
+    }
+  };
+
+  if (getSettings.isLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="animate-spin text-[#71717A]" size={30} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-[24px]">
@@ -29,6 +78,13 @@ const BackupSettings = () => {
           </div>
 
           <div className="flex flex-col gap-[16px]">
+            {backup?.lastBackupAt && (
+              <p className="text-[12px] text-[#71717A] font-medium">
+                Last backup:{" "}
+                {new Date(backup.lastBackupAt).toLocaleDateString()}
+              </p>
+            )}
+
             <button className="flex cursor-pointer items-center gap-2 w-fit px-4 py-2 border border-[#E2E4E9] rounded-[8px] text-[12px] font-medium text-[#1D1D1D] hover:bg-gray-50 transition-colors">
               <Shield size={14} />
               Request Approval
@@ -63,7 +119,6 @@ const BackupSettings = () => {
         </div>
 
         <div className="bg-white border border-[#E2E4E9] rounded-[12px] p-[24px] flex flex-col justify-between">
-          {/* Header */}
           <div className="flex flex-col gap-[8px]">
             <div className="flex items-center gap-[10px]">
               <FileDown size={18} className="text-[#1D1D1D]" />
@@ -77,13 +132,28 @@ const BackupSettings = () => {
           </div>
 
           <div className="flex flex-col gap-[12px] mt-6">
-            <button className="w-full cursor-pointer bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] h-[40px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-100 transition-colors">
+            <button
+              onClick={() =>
+                exportCsv("/backups/sales/export-csv", "sales.csv")
+              }
+              className="w-full cursor-pointer bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] h-[40px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-100 transition-colors"
+            >
               Export Sales (CSV)
             </button>
-            <button className="w-full cursor-pointer bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] h-[40px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-100 transition-colors">
+            <button
+              onClick={() =>
+                exportCsv("/backups/customers/export-csv", "customers.csv")
+              }
+              className="w-full cursor-pointer bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] h-[40px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-100 transition-colors"
+            >
               Export Customers (CSV)
             </button>
-            <button className="w-full cursor-pointer bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] h-[40px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-100 transition-colors">
+            <button
+              onClick={() =>
+                exportCsv("/backups/inventory/export-csv", "inventory.csv")
+              }
+              className="w-full cursor-pointer bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] h-[40px] text-[13px] font-medium text-[#1D1D1D] hover:bg-gray-100 transition-colors"
+            >
               Export Inventory (CSV)
             </button>
           </div>
@@ -98,11 +168,7 @@ const BackupSettings = () => {
         </div>
       </div>
 
-      <div
-        className="bg-white border border-[#E2E4E9] rounded-[12px] p-[24px] flex flex-col gap-[24px]
-      
-        "
-      >
+      <div className="bg-white border border-[#E2E4E9] rounded-[12px] p-[24px] flex flex-col gap-[24px]">
         <div className="flex flex-col gap-[8px]">
           <div className="flex items-center gap-[10px]">
             <Clock size={18} className="text-[#1D1D1D]" />
@@ -127,50 +193,20 @@ const BackupSettings = () => {
             </div>
 
             <button
-              onClick={() => setAutoBackup(!autoBackup)}
+              onClick={handleToggleAutoBackup}
               className={`w-[44px] h-[24px] rounded-full cursor-pointer p-1 transition-colors duration-200 ease-in-out ${
-                autoBackup ? "bg-[#2474F5]" : "bg-[#E4E4E7]"
+                backup?.scheduleEnabled ? "bg-[#2474F5]" : "bg-[#E4E4E7]"
               }`}
             >
               <div
-                className={`w-[16px] h-[16px] bg-white cursor-pointer rounded-full  transition-transform duration-200 ease-in-out ${
-                  autoBackup ? "translate-x-[20px]" : "translate-x-0"
+                className={`w-[16px] h-[16px] bg-white cursor-pointer rounded-full transition-transform duration-200 ease-in-out ${
+                  backup?.scheduleEnabled
+                    ? "translate-x-[20px]"
+                    : "translate-x-0"
                 }`}
               />
             </button>
           </div>
-
-          <div className="h-[1px] w-full bg-[#F4F4F5]"></div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col gap-1">
-              <h3 className="text-[14px] font-medium text-[#1D1D1D]">
-                Cloud Sync
-              </h3>
-              <p className="text-[12px] text-[#71717A]">
-                Automatically upload encrypted backups to cloud storage
-              </p>
-            </div>
-
-            <button
-              onClick={() => setCloudSync(!cloudSync)}
-              className={`w-[44px] h-[24px] rounded-full cursor-pointer p-1 transition-colors duration-200 ease-in-out ${
-                cloudSync ? "bg-[#2474F5]" : "bg-[#E4E4E7]"
-              }`}
-            >
-              <div
-                className={`w-[16px] h-[16px] bg-white cursor-pointer rounded-full  transition-transform duration-200 ease-in-out ${
-                  cloudSync ? "translate-x-[20px]" : "translate-x-0"
-                }`}
-              />
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-2">
-          <button className="w-full cursor-pointer bg-[#FAFAFB] border border-[#E2E4E9] rounded-[8px] h-[48px] text-[14px] font-medium text-[#1D1D1D] hover:bg-gray-100 transition-colors">
-            Configure Schedule
-          </button>
         </div>
       </div>
     </div>

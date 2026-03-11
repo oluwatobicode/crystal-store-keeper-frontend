@@ -1,70 +1,73 @@
 import { X, Loader2, Check } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { permissionsSections } from "../utils/Permissions";
+import { useRoles } from "../hooks/useRoles";
+import { toggleSection } from "../utils/toggleSection";
+import { togglePermission } from "../utils/togglePermission";
+import toast from "react-hot-toast";
+import {
+  roleSchema,
+  type CustomRulesModalProps,
+  type RoleFormData,
+} from "../types/Roles";
 
-const roleSchema = z.object({
-  roleName: z.string().min(3, "Role Name is required"),
-  description: z.string().optional(),
-});
+const CustomRulesModal = ({
+  isOpen,
+  onClose,
+  roleToEdit,
+}: CustomRulesModalProps) => {
+  const isEditMode = !!roleToEdit;
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>(
+    roleToEdit?.permissions || [],
+  );
 
-type RoleFormData = z.infer<typeof roleSchema>;
-
-interface CustomRulesModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
-  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+  const { createRole, editRoles } = useRoles();
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setValue,
   } = useForm<RoleFormData>({
     resolver: zodResolver(roleSchema),
   });
 
-  const togglePermission = (id: string) => {
-    setSelectedPermissions((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
-    );
-  };
-
-  const toggleSection = (sectionItems: { id: string }[]) => {
-    const allIds = sectionItems.map((item) => item.id);
-    const allSelected = allIds.every((id) => selectedPermissions.includes(id));
-
-    if (allSelected) {
-      // Deselect all
-      setSelectedPermissions((prev) =>
-        prev.filter((id) => !allIds.includes(id)),
-      );
-    } else {
-      // Select all (merge unique)
-      setSelectedPermissions((prev) =>
-        Array.from(new Set([...prev, ...allIds])),
-      );
+  useEffect(() => {
+    if (roleToEdit) {
+      setValue("roleName", roleToEdit.roleName);
+      setValue("description", roleToEdit.description || "");
     }
-  };
+  }, [roleToEdit, setValue]);
 
   const onSubmit = async (data: RoleFormData) => {
-    // Simulate API submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("Role Data:", data);
-    console.log("Selected Permissions:", selectedPermissions);
+    const formattedData = {
+      roleName: data.roleName,
+      description: data.description,
+      permissions: selectedPermissions,
+    };
 
-    const foramatedData = { data, selectedPermissions };
-    console.log(foramatedData);
-
-    // Close & Reset
-    reset();
-    setSelectedPermissions([]);
-    // onClose();
+    try {
+      if (isEditMode) {
+        await editRoles.mutateAsync({
+          id: roleToEdit._id,
+          data: formattedData,
+        });
+        toast.success("Role updated successfully");
+      } else {
+        await createRole.mutateAsync(formattedData);
+        toast.success("Role created successfully");
+      }
+      reset();
+      setSelectedPermissions([]);
+      onClose();
+    } catch {
+      toast.error(
+        isEditMode ? "Failed to update role" : "Failed to create role",
+      );
+    }
   };
 
   if (!isOpen) return null;
@@ -75,10 +78,12 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
         <div className="p-[24px]  flex justify-between items-start bg-white shrink-0">
           <div className="flex flex-col gap-1">
             <h1 className="text-[18px] font-bold uppercase tracking-[0.9px] text-[#1D1D1D]">
-              Create Custom Role
+              {isEditMode ? "Edit Role" : "Create Custom Role"}
             </h1>
             <p className="text-[13px] text-[#71717A] font-medium">
-              Define a new role with specific permissions and access levels
+              {isEditMode
+                ? "Update role details and permissions"
+                : "Define a new role with specific permissions and access levels"}
             </p>
           </div>
           <button
@@ -140,7 +145,13 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
                       </h4>
                       <button
                         type="button"
-                        onClick={() => toggleSection(section.items)}
+                        onClick={() =>
+                          toggleSection(
+                            section.items,
+                            selectedPermissions,
+                            setSelectedPermissions,
+                          )
+                        }
                         className="text-[12px] font-medium text-[#1D1D1D] bg-[#FAFAFB] border border-[#E2E4E9] px-3 py-1.5 rounded-[6px] hover:bg-gray-100 transition-colors"
                       >
                         Select all
@@ -155,7 +166,9 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
                         return (
                           <div
                             key={item.id}
-                            onClick={() => togglePermission(item.id)}
+                            onClick={() =>
+                              togglePermission(item.id, setSelectedPermissions)
+                            }
                             className="flex items-start gap-3 cursor-pointer group"
                           >
                             <div
@@ -199,7 +212,6 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
           </form>
         </div>
 
-        {/* --- FOOTER --- */}
         <div className="p-[24px] border-t border-[#E4E4E7] bg-white flex justify-end gap-[12px] shrink-0">
           <button
             type="button"
@@ -210,14 +222,14 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
           </button>
           <button
             type="submit"
-            form="role-form" // Connects to the form ID above
+            form="role-form"
             disabled={isSubmitting}
             className="h-[44px] px-8 rounded-[8px] bg-[#1A47FE] text-[13px] font-bold text-white hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             {isSubmitting ? (
               <Loader2 className="animate-spin" size={16} />
             ) : null}
-            Create Rolexs
+            {isEditMode ? "Update Role" : "Create Role"}
           </button>
         </div>
       </div>

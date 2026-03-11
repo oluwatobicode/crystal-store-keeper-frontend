@@ -1,19 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileText, Loader2 } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import { useSettings } from "../../hooks/useSettings";
+import toast from "react-hot-toast";
 
 const InvoiceSettingsSchema = z.object({
-  invoicePrefix: z
+  prefix: z
     .string()
     .min(1, { message: "Invoice prefix must be at least 1 character" }),
   startingNumber: z
     .string()
     .min(1, { message: "Starting number must be at least 1" }),
-  defaultPaymentTerms: z
+  paymentTerms: z
     .string()
     .min(5, { message: "Default terms must be at least 5 characters" }),
-  invoiceNotes: z
+  notes: z
     .string()
     .min(5, { message: "Invoice notes must be at least 5 characters" }),
 });
@@ -21,24 +24,51 @@ const InvoiceSettingsSchema = z.object({
 type InvoiceFormData = z.infer<typeof InvoiceSettingsSchema>;
 
 const InvoiceSettings = () => {
+  const { getSettings, updateSettings } = useSettings();
+  const settingsData = getSettings?.data?.data?.data;
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<InvoiceFormData>({
     resolver: zodResolver(InvoiceSettingsSchema),
-    defaultValues: {
-      invoicePrefix: "INV-",
-      startingNumber: "1001",
-      defaultPaymentTerms: "Due on Receipt",
-    },
   });
 
+  useEffect(() => {
+    if (settingsData?.invoice) {
+      const inv = settingsData.invoice;
+      setValue("prefix", inv.prefix || "");
+      setValue("startingNumber", String(inv.startingNumber || ""));
+      setValue("paymentTerms", inv.paymentTerms || "");
+      setValue("notes", inv.notes || "");
+    }
+  }, [settingsData, setValue]);
+
   const onSubmit = async (data: InvoiceFormData) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Invoice Settings Saved:", data);
+    try {
+      await updateSettings.mutateAsync({
+        invoice: {
+          prefix: data.prefix,
+          startingNumber: Number(data.startingNumber),
+          paymentTerms: data.paymentTerms,
+          notes: data.notes,
+        },
+      });
+      toast.success("Invoice settings saved");
+    } catch {
+      toast.error("Failed to save invoice settings");
+    }
   };
+
+  if (getSettings.isLoading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="animate-spin text-[#71717A]" size={30} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-[26px] bg-white w-full h-auto px-[24px] py-[24px] border border-[#E2E4E9] rounded-[12px]">
@@ -66,12 +96,12 @@ const InvoiceSettings = () => {
             <input
               type="text"
               placeholder="e.g. INV-"
-              {...register("invoicePrefix")}
+              {...register("prefix")}
               className="w-full mt-[8px] bg-[#FAFAFB] text-[13px] outline-none transition-colors h-[43px] rounded-[8px] border border-[#E2E4E9] px-[12px] py-[8px]"
             />
-            {errors.invoicePrefix && (
+            {errors.prefix && (
               <span className="text-red-500 text-[10px] mt-1 block">
-                {errors.invoicePrefix.message}
+                {errors.prefix.message}
               </span>
             )}
           </div>
@@ -101,12 +131,12 @@ const InvoiceSettings = () => {
           <input
             type="text"
             placeholder="e.g. Due on Receipt, Net 30"
-            {...register("defaultPaymentTerms")}
+            {...register("paymentTerms")}
             className="w-full mt-[8px] bg-[#FAFAFB] outline-none text-[12px] transition-colors h-[43px] rounded-[8px] border border-[#E2E4E9] px-[12px] py-[8px]"
           />
-          {errors.defaultPaymentTerms && (
+          {errors.paymentTerms && (
             <span className="text-red-500 text-[10px] mt-1 block">
-              {errors.defaultPaymentTerms.message}
+              {errors.paymentTerms.message}
             </span>
           )}
         </div>
@@ -117,7 +147,7 @@ const InvoiceSettings = () => {
           </label>
           <textarea
             placeholder="Thank you for your business..."
-            {...register("invoiceNotes")}
+            {...register("notes")}
             className="w-full mt-[8px] bg-[#FAFAFB] outline-none text-[13px] transition-colors h-[80px] rounded-[8px] border border-[#E2E4E9] px-[12px] py-[8px] resize-none"
           />
         </div>

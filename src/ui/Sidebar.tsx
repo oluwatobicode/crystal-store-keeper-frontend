@@ -7,7 +7,8 @@ import {
   UserCog,
   Users,
   FileText,
-  LogOut, // Added Logout icon
+  LogOut,
+  Truck,
 } from "lucide-react";
 import { BsBucketFill } from "react-icons/bs";
 import { NavLink } from "react-router";
@@ -35,6 +36,11 @@ const Sidebar: React.FC = () => {
       label: "Products & Stock",
       icon: <Package size={19} />,
       href: "/products",
+    },
+    {
+      label: "Suppliers",
+      icon: <Truck size={19} />,
+      href: "/suppliers",
     },
     {
       label: "Payments & Transactions",

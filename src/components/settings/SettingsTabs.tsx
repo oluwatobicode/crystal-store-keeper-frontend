@@ -4,11 +4,13 @@ import InvoiceSettings from "./InvoiceSettings";
 import AuditLogsSettings from "./AuditLogsSettings";
 import BackupSettings from "./BackupSettings";
 import SystemSettings from "./SystemSettings";
+import TelegramSettings from "./TelegramSettings";
 
 const settingsTabs = [
   { tab: "Business" },
   { tab: "Invoice" },
   { tab: "System" },
+  { tab: "Telegram" },
   { tab: "Backup" },
   { tab: "Audit Logs" },
 ] as const;
@@ -39,6 +41,7 @@ const SettingsTabs = () => {
       {currentTab === "Business" && <BusinessSettings />}
       {currentTab === "Invoice" && <InvoiceSettings />}
       {currentTab === "System" && <SystemSettings />}
+      {currentTab === "Telegram" && <TelegramSettings />}
       {currentTab === "Audit Logs" && <AuditLogsSettings />}
       {currentTab === "Backup" && <BackupSettings />}
     </div>

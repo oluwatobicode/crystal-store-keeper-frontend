@@ -1,20 +1,21 @@
-import { Loader2, Shield, SquarePen } from "lucide-react";
+import { Loader2, Shield, SquarePen, Trash2Icon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import CustomRulesModal from "../../ui/CustomRulesModal";
+import DeleteRoleModal from "../../ui/DeleteRoleModal";
 import { useRoles } from "../../hooks/useRoles";
 import type { Roles } from "../../types/Roles";
 import toast from "react-hot-toast";
 
 const RolesPermission = () => {
   const [isRulesModalOpen, setIsRulesModalOpen] = useState<boolean>(false);
+  const [roleToDelete, setRoleToDelete] = useState<Roles | null>(null);
+  const [roleToEdit, setRoleToEdit] = useState<Roles | null>(null);
 
-  const { allRoles } = useRoles();
+  const { allRoles, deleteRole } = useRoles();
   const isLoading = allRoles?.isLoading;
   const userResponse = allRoles?.data?.data;
 
   const { data: allRolesData } = userResponse || {};
-
-  console.log(allRolesData);
 
   const hasToasted = useRef(false);
   useEffect(() => {
@@ -37,7 +38,10 @@ const RolesPermission = () => {
         </div>
 
         <button
-          onClick={() => setIsRulesModalOpen(true)}
+          onClick={() => {
+            setRoleToEdit(null);
+            setIsRulesModalOpen(true);
+          }}
           className="px-[16px] py-[9px] cursor-pointer bg-[#2474F5] hover:bg-blue-600 transition-colors text-white tracking-[0.9px] rounded-[8px] text-[14px] font-medium flex items-center gap-2"
         >
           <Shield size={16} />
@@ -72,10 +76,22 @@ const RolesPermission = () => {
                     {role.description}
                   </p>
                 </div>
-                <SquarePen
-                  size={18}
-                  className="text-[#71717A] cursor-pointer hover:text-black transition-colors"
-                />
+                <div className="flex flex-row gap-[12px]">
+                  <SquarePen
+                    size={18}
+                    className="text-[#71717A] cursor-pointer hover:text-black transition-colors"
+                    onClick={() => {
+                      setRoleToEdit(role);
+                      setIsRulesModalOpen(true);
+                    }}
+                  />
+
+                  <Trash2Icon
+                    size={18}
+                    onClick={() => setRoleToDelete(role)}
+                    className="text-[#71717A] cursor-pointer hover:text-red-500 transition-colors"
+                  />
+                </div>
               </div>
 
               <div className="flex flex-col gap-[12px] mt-2">
@@ -99,8 +115,33 @@ const RolesPermission = () => {
       </div>
 
       <CustomRulesModal
+        key={roleToEdit?._id || "create"}
         isOpen={isRulesModalOpen}
-        onClose={() => setIsRulesModalOpen(false)}
+        onClose={() => {
+          setIsRulesModalOpen(false);
+          setRoleToEdit(null);
+        }}
+        roleToEdit={roleToEdit}
+      />
+
+      <DeleteRoleModal
+        isOpen={!!roleToDelete}
+        onClose={() => setRoleToDelete(null)}
+        roleName={roleToDelete?.roleName ?? ""}
+        isDeleting={deleteRole.isPending}
+        onConfirm={() => {
+          if (roleToDelete) {
+            deleteRole.mutate(roleToDelete._id, {
+              onSuccess: () => {
+                toast.success("Role deleted successfully");
+                setRoleToDelete(null);
+              },
+              onError: () => {
+                toast.error("Failed to delete role");
+              },
+            });
+          }
+        }}
       />
     </div>
   );
