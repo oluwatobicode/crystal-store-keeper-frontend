@@ -2,151 +2,153 @@ import {
   Search,
   Calendar,
   CreditCard,
-  Link,
   User,
   Eye,
   CircleCheckBig,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
+import { useState, useMemo } from "react";
+import { useSales } from "../../hooks/useSales";
+import type { Sale } from "../../types/SalesRecord";
+import SaleDetailsModal from "../../ui/SaleDetailsModal";
+import { format } from "date-fns";
 
-const paymentsHistory = [
-  {
-    invoiceNo: "INV-2024-001",
-    company: "Smith Construction",
-    date: "16/08/2024",
-    method: "CARD",
-    pos: "POS-001234",
-    amount: "₦234.50",
-    attendant: "Cashier User",
-  },
-  {
-    invoiceNo: "INV-2024-002",
-    company: "DIY Home Ltd",
-    date: "16/08/2024",
-    method: "CASH",
-    pos: null,
-    amount: "₦89.99",
-    attendant: "Cashier User",
-  },
-  // --- New Data Entries ---
-  {
-    invoiceNo: "INV-2024-003",
-    company: "Nexus Tech Solutions",
-    date: "17/08/2024",
-    method: "TRANSFER",
-    pos: null,
-    amount: "₦1,250.00",
-    attendant: "Admin User",
-  },
-  {
-    invoiceNo: "INV-2024-004",
-    company: "Sarah Johnson",
-    date: "17/08/2024",
-    method: "CASH",
-    pos: null,
-    amount: "₦45.00",
-    attendant: "Cashier User",
-  },
-  {
-    invoiceNo: "INV-2024-005",
-    company: "Premium Paint Supplies",
-    date: "18/08/2024",
-    method: "CARD",
-    pos: "POS-005678",
-    amount: "₦3,120.75",
-    attendant: "Cashier User",
-  },
-  {
-    invoiceNo: "INV-2024-006",
-    company: "Build-It Better Co.",
-    date: "19/08/2024",
-    method: "CARD",
-    pos: "POS-009012",
-    amount: "₦15,400.00",
-    attendant: "Admin User",
-  },
-  {
-    invoiceNo: "INV-2024-007",
-    company: "Urban Decor",
-    date: "20/08/2024",
-    method: "TRANSFER",
-    pos: null,
-    amount: "₦670.20",
-    attendant: "Cashier User",
-  },
-];
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+  }).format(amount);
+};
 
 const AllPayments = () => {
+  const { allSales } = useSales();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const sales = allSales.data?.data || [];
+  const isLoading = allSales.isLoading;
+
+  const filteredSales = useMemo(() => {
+    if (!searchQuery.trim()) return sales;
+    const term = searchQuery.toLowerCase();
+    return sales.filter(
+      (sale) =>
+        sale.invoiceId.toLowerCase().includes(term) ||
+        sale._id.toLowerCase().includes(term) ||
+        sale.customerSnapshot.name.toLowerCase().includes(term) ||
+        (sale.customerSnapshot.phone &&
+          sale.customerSnapshot.phone.includes(term)),
+    );
+  }, [sales, searchQuery]);
+
+  const handleViewDetails = (id: string) => {
+    setSelectedSaleId(id);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="flex flex-col gap-[24px]">
-      <div className="bg-white p-[20.5px]">
-        <div className="relative w-full max-w-[1014px]">
+      <div className="bg-white p-[20.5px] rounded-[12px] border border-[#E4E4E7]">
+        <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-400 pointer-events-none" />
           <input
             type="text"
-            placeholder="Search Payments & Transactions"
-            className="h-[43px] placeholder:text-[12px] bg-transparent w-full rounded-[11.31px] border border-[#E4E4E7] pl-10 pr-4 outline-none transition-colors focus:border-gray-400"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by Invoice ID, Transaction ID, or Customer"
+            className="h-[43px] placeholder:text-[12px] bg-transparent w-full rounded-[11.31px] border border-[#E4E4E7] pl-10 pr-4 outline-none transition-colors focus:border-gray-400 text-[13px]"
           />
         </div>
       </div>
 
       <div className="flex flex-col gap-4">
-        {paymentsHistory.map((item, index) => (
-          <div
-            key={index}
-            className="bg-white border border-[#E2E4E9] rounded-[12px] p-8 flex flex-row justify-between items-center"
-          >
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-4">
-                <h3 className="text-black text-[18px] font-medium tracking-tight">
-                  {item.invoiceNo}
-                </h3>
-
-                <div className="flex items-center gap-1 bg-[#C6F6D5] border border-[#22C35D4D] text-[#2F855A] px-3 py-1 rounded-full text-[12px] font-medium">
-                  <CircleCheckBig size={14} />
-                  Paid
-                </div>
-              </div>
-
-              <h2 className="text-[#71717A] text-[16px] font-semibold">
-                {item.company}
-              </h2>
-
-              <div className="flex items-center gap-6 mt-1">
-                <div className="flex items-center gap-2 text-[#71717A] text-[12px]">
-                  <Calendar size={14} />
-                  {item.date}
-                </div>
-                <div className="flex items-center gap-2 text-[#71717A] text-[12px] uppercase">
-                  <CreditCard size={14} />
-                  {item.method}
-                </div>
-                {item.pos && (
-                  <div className="flex items-center gap-2 text-[#71717A] text-[12px]">
-                    <Link size={14} />
-                    {item.pos}
-                  </div>
-                )}
-                <div className="flex items-center gap-2 text-[#71717A] text-[12px]">
-                  <User size={14} />
-                  {item.attendant}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-end gap-4">
-              <h2 className="text-[#000000] leading-[16.2px] tracking-[0.9px] text-[18px] font-medium">
-                {item.amount}
-              </h2>
-              <button className="bg-[#F9FAFB] border border-[#E4E4E7] flex items-center justify-center gap-[10px] text-black px-3.5 py-2 rounded-[8px] text-[12px] font-medium cursor-pointer  transition-colors">
-                <span>
-                  <Eye size={20} />
-                </span>
-                View details
-              </button>
-            </div>
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[12px] border border-[#E2E4E9]">
+            <Loader2 className="animate-spin text-[#2474F5] mb-2" size={40} />
+            <p className="text-[14px] text-[#71717A]">
+              Fetching transactions...
+            </p>
           </div>
-        ))}
+        ) : filteredSales.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[12px] border border-[#E2E4E9] text-center">
+            <AlertCircle size={40} className="text-gray-300 mb-2" />
+            <p className="text-[14px] text-[#71717A] font-medium">
+              No transactions found
+            </p>
+            <p className="text-[12px] text-[#71717A]">
+              Try adjusting your search criteria
+            </p>
+          </div>
+        ) : (
+          filteredSales.map((sale: Sale) => (
+            <div
+              key={sale._id}
+              className="bg-white border border-[#E2E4E9] rounded-[12px] p-6 lg:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
+            >
+              <div className="flex flex-col gap-3 flex-1">
+                <div className="flex items-center gap-4 flex-wrap">
+                  <h3 className="text-black text-[18px]  tracking-tight">
+                    {sale.invoiceId}
+                  </h3>
+
+                  <div
+                    className={`flex items-center gap-1 border px-3 py-1 rounded-full text-[12px]  uppercase ${
+                      sale.paymentStatus === "paid"
+                        ? "bg-green-50 border-green-200 text-green-700"
+                        : "bg-yellow-50 border-yellow-200 text-yellow-700"
+                    }`}
+                  >
+                    <CircleCheckBig size={14} />
+                    {sale.paymentStatus}
+                  </div>
+                </div>
+
+                <h2 className="text-[#71717a] text-[16px] font-bold">
+                  {sale.customerSnapshot.name}
+                </h2>
+
+                <div className="flex items-center gap-x-6 gap-y-2 flex-wrap mt-1">
+                  <div className="flex items-center gap-2 text-[#71717A] text-[12px] font-medium">
+                    <Calendar size={14} />
+                    {format(new Date(sale.createdAt), "dd/MM/yyyy")}
+                  </div>
+                  <div className="flex items-center gap-2 text-[#71717A] text-[12px] font-medium uppercase">
+                    <CreditCard size={14} />
+                    {sale.payments
+                      .map((p) => p.method.replace("_", " "))
+                      .join(", ")}
+                  </div>
+                  <div className="flex items-center gap-2 text-[#71717A] text-[12px] font-medium">
+                    <User size={14} />
+                    {sale.salesPersonId.fullname}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-end gap-4 w-full md:w-auto">
+                <h2 className="text-[#000000] leading-none tracking-tight text-[22px]">
+                  {formatCurrency(sale.grandTotal)}
+                </h2>
+                <button
+                  onClick={() => handleViewDetails(sale._id)}
+                  className="bg-[#F9FAFB] border border-[#E4E4E7] flex items-center justify-center gap-[10px] text-black px-4 py-2 rounded-[8px] text-[12px] font-bold cursor-pointer hover:bg-gray-100 transition-colors w-full md:w-auto"
+                >
+                  <Eye size={18} />
+                  View Details
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
+
+      <SaleDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        saleId={selectedSaleId}
+      />
     </div>
   );
 };

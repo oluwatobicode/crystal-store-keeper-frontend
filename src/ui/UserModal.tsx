@@ -6,12 +6,13 @@ import { useRoles } from "../hooks/useRoles";
 import { useUsers } from "../hooks/useUsers";
 import type { Roles } from "../types/Roles";
 import toast from "react-hot-toast";
-import { generatePassword } from "../utils/generatePassword";
+
 import {
   userSchema,
   type UserFormData,
   type UserModalProps,
 } from "../types/User";
+import { generatePassword } from "../utils/generatePassword";
 
 const UserModal = ({ isOpen, onClose, userToEdit }: UserModalProps) => {
   const isEditMode = !!userToEdit;
