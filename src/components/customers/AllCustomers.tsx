@@ -4,7 +4,7 @@ import { MdEmail } from "react-icons/md";
 import { useCustomers } from "../../hooks/useCustomers";
 import type { Customer } from "../../types/Customers";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { formatDate } from "../../utils/formatData";
+import { formatDate } from "../../utils/formatDate";
 
 interface AllCustomersProps {
   onEditClick: (customer: Customer) => void;

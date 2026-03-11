@@ -3,183 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-
-// --- 1. Data Structure for Permissions ---
-const permissionsSections = [
-  {
-    title: "Dashboard",
-    key: "dashboard",
-    items: [
-      {
-        id: "dash.view",
-        label: "View Dashboard",
-        desc: "Access dashboard overview",
-      },
-    ],
-  },
-  {
-    title: "Point of Sale",
-    key: "pos",
-    items: [
-      {
-        id: "pos.operate",
-        label: "Operate POS",
-        desc: "Create and process sales transactions",
-      },
-      {
-        id: "pos.discount.small",
-        label: "Small Discounts",
-        desc: "Apply discounts up to threshold",
-      },
-      {
-        id: "pos.discount.large",
-        label: "Large Discounts",
-        desc: "Apply discounts above threshold",
-      },
-      {
-        id: "pos.refund",
-        label: "Process Refunds",
-        desc: "Issue refunds and returns",
-      },
-    ],
-  },
-  {
-    title: "Customers",
-    key: "customers",
-    items: [
-      {
-        id: "cust.view",
-        label: "View Customers",
-        desc: "Search and view customer information",
-      },
-      {
-        id: "cust.manage",
-        label: "Manage Customers",
-        desc: "Add, edit, and delete customers",
-      },
-      {
-        id: "cust.history",
-        label: "Customer History",
-        desc: "View complete purchase history",
-      },
-    ],
-  },
-  {
-    title: "Inventory",
-    key: "inventory",
-    items: [
-      {
-        id: "inv.view",
-        label: "View Inventory",
-        desc: "View product catalog and stock levels",
-      },
-      {
-        id: "inv.manage",
-        label: "Manage Products",
-        desc: "Add, edit, and delete products",
-      },
-      {
-        id: "inv.receive",
-        label: "Receive Stock",
-        desc: "Process incoming stock deliveries",
-      },
-      {
-        id: "inv.adjust",
-        label: "Stock Adjustments",
-        desc: "Make stock corrections and adjustments",
-      },
-    ],
-  },
-  {
-    title: "Transactions & Payments",
-    key: "transactions",
-    items: [
-      {
-        id: "trans.view_all",
-        label: "View All Transactions",
-        desc: "Access complete transaction history",
-      },
-      {
-        id: "trans.view_own",
-        label: "View Own Transactions",
-        desc: "View only personal transactions",
-      },
-      {
-        id: "trans.reconcile",
-        label: "Reconcile Payments",
-        desc: "Mark payments as confirmed",
-      },
-      {
-        id: "trans.manage",
-        label: "Manage Payments",
-        desc: "Edit payment status and details",
-      },
-    ],
-  },
-  {
-    title: "Reports & Analytics",
-    key: "reports",
-    items: [
-      {
-        id: "rep.view",
-        label: "View Dashboard",
-        desc: "Access financial and operational reports",
-      },
-      {
-        id: "rep.export",
-        label: "Export Reports",
-        desc: "Export data to CSV/Excel",
-      },
-      {
-        id: "rep.profit",
-        label: "Profit Reports",
-        desc: "View profit margins and cost analysis",
-      },
-    ],
-  },
-  {
-    title: "User Management",
-    key: "users",
-    items: [
-      {
-        id: "user.manage",
-        label: "Manage Users",
-        desc: "Create, edit, and deactivate user accounts",
-      },
-      {
-        id: "role.manage",
-        label: "Manage Roles",
-        desc: "Create and modify user roles and permissions",
-      },
-      {
-        id: "user.audit",
-        label: "User Activity",
-        desc: "View user activity and audit logs",
-      },
-    ],
-  },
-  {
-    title: "System Settings",
-    key: "settings",
-    items: [
-      {
-        id: "sys.config",
-        label: "System Settings",
-        desc: "Configure system and business settings",
-      },
-      {
-        id: "sys.backup",
-        label: "Backup & Restore",
-        desc: "Create backups and restore data",
-      },
-      {
-        id: "sys.logs",
-        label: "Audit Logs",
-        desc: "View and export system audit logs",
-      },
-    ],
-  },
-];
+import { permissionsSections } from "../utils/Permissions";
 
 const roleSchema = z.object({
   roleName: z.string().min(3, "Role Name is required"),
@@ -207,7 +31,7 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
 
   const togglePermission = (id: string) => {
     setSelectedPermissions((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id],
     );
   };
 
@@ -218,12 +42,12 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
     if (allSelected) {
       // Deselect all
       setSelectedPermissions((prev) =>
-        prev.filter((id) => !allIds.includes(id))
+        prev.filter((id) => !allIds.includes(id)),
       );
     } else {
       // Select all (merge unique)
       setSelectedPermissions((prev) =>
-        Array.from(new Set([...prev, ...allIds]))
+        Array.from(new Set([...prev, ...allIds])),
       );
     }
   };
@@ -234,10 +58,13 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
     console.log("Role Data:", data);
     console.log("Selected Permissions:", selectedPermissions);
 
+    const foramatedData = { data, selectedPermissions };
+    console.log(foramatedData);
+
     // Close & Reset
     reset();
     setSelectedPermissions([]);
-    onClose();
+    // onClose();
   };
 
   if (!isOpen) return null;
@@ -323,7 +150,7 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
                     <div className="flex flex-col gap-[16px]">
                       {section.items.map((item) => {
                         const isSelected = selectedPermissions.includes(
-                          item.id
+                          item.id,
                         );
                         return (
                           <div
@@ -390,7 +217,7 @@ const CustomRulesModal = ({ isOpen, onClose }: CustomRulesModalProps) => {
             {isSubmitting ? (
               <Loader2 className="animate-spin" size={16} />
             ) : null}
-            Create Roles
+            Create Rolexs
           </button>
         </div>
       </div>

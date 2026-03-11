@@ -1,7 +1,7 @@
 import { History, Loader2, ReceiptText } from "lucide-react";
 import { useDashboard } from "../../hooks/useDashboard";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { formatDate } from "../../utils/formatData";
+import { formatDate } from "../../utils/formatDate";
 import type { SaleRecord } from "../../types/SalesRecord";
 import { getStyle } from "../../utils/getStyle";
 

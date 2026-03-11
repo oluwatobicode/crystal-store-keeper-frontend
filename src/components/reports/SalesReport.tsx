@@ -1,7 +1,7 @@
 import { Loader2, ReceiptText } from "lucide-react";
 import { useReports } from "../../hooks/useReports";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { formatDate } from "../../utils/formatData";
+import { formatDate } from "../../utils/formatDate";
 import type { DailyBreakdown } from "../../types/Reports";
 
 const SalesReport = () => {

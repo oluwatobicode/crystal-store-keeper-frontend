@@ -1,73 +1,44 @@
-import { EyeIcon, PlusIcon, Search, SquarePen, Trash2 } from "lucide-react";
+import {
+  EyeIcon,
+  Loader2,
+  PlusIcon,
+  Search,
+  SquarePen,
+  Trash2,
+} from "lucide-react";
+import { useEffect, useRef } from "react";
+import toast from "react-hot-toast";
+import { getStatusColor } from "../../utils/getStatusColor";
+import { useUsers } from "../../hooks/useUsers";
+import type { UsersData } from "../../types/User";
+import { formatDate } from "../../utils/formatDate";
+import { formatUserId } from "../../utils/formatUserId";
 
 interface AllUsersProps {
   onAddUserClick: () => void;
+  onDeleteClick: (user: UsersData) => void;
+  onViewClick: (user: UsersData) => void;
 }
 
-const allUsers = [
-  {
-    userId: "U-1023",
-    fullName: "Sarah Jenkins",
-    username: "s.jenkins",
-    role: "Admin",
-    status: "Active",
-    lastLogin: "2024-01-15 08:30 AM",
-  },
-  {
-    userId: "U-1024",
-    fullName: "Michael Ojo",
-    username: "m.ojo",
-    role: "Manager",
-    status: "Active",
-    lastLogin: "2024-01-15 09:15 AM",
-  },
-  {
-    userId: "U-1025",
-    fullName: "David Chen",
-    username: "d.chen88",
-    role: "Accountant",
-    status: "Active",
-    lastLogin: "2024-01-14 04:45 PM",
-  },
-  {
-    userId: "U-1026",
-    fullName: "Jessica Brown",
-    username: "j.brown",
-    role: "Inventory Clerk",
-    status: "Inactive",
-    lastLogin: "2023-12-20 11:00 AM",
-  },
-  {
-    userId: "U-1027",
-    fullName: "Amanda Lewis",
-    username: "a.lewis",
-    role: "Inventory Clerk",
-    status: "Active",
-    lastLogin: "2024-01-15 07:55 AM",
-  },
-  {
-    userId: "U-1028",
-    fullName: "Robert Wilson",
-    username: "r.wilson",
-    role: "Manager",
-    status: "Suspended",
-    lastLogin: "2024-01-10 02:20 PM",
-  },
-];
+const AllUsers = ({
+  onAddUserClick,
+  onDeleteClick,
+  onViewClick,
+}: AllUsersProps) => {
+  const { allUsers } = useUsers();
 
-const AllUsers = ({ onAddUserClick }: AllUsersProps) => {
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Active":
-        return "text-green-600";
-      case "Inactive":
-        return "text-gray-400";
-      case "Suspended":
-        return "text-red-500";
-      default:
-        return "text-[#6c7788]";
+  const isLoading = allUsers?.isLoading;
+  const userResponse = allUsers?.data?.data;
+  const { data: allUser } = userResponse || {};
+
+  // Toast on successful fetch
+  const hasToasted = useRef(false);
+  useEffect(() => {
+    if (userResponse?.message && !hasToasted.current) {
+      toast.success(userResponse.message);
+      hasToasted.current = true;
     }
-  };
+  }, [userResponse]);
 
   return (
     <div className="flex flex-col w-full gap-[17px] px-[24px] h-auto py-[24px] bg-white">
@@ -127,48 +98,74 @@ const AllUsers = ({ onAddUserClick }: AllUsersProps) => {
         </thead>
 
         <tbody className="bg-white divide-y divide-[#e1e4ea]">
-          {allUsers.map((user) => (
-            <tr key={user.userId}>
-              <td className="p-4 text-xs font-medium text-[#1D1D1D]   tracking-wider">
-                {user.userId}
-              </td>
-              <td className="p-4 text-xs font-medium text-[#1D1D1D] tracking-wider">
-                {user.fullName}
-              </td>
-              <td className="p-4 text-xs font-medium text-[#1D1D1D]  tracking-wider">
-                {user.username}
-              </td>
-              <td className="p-4 text-xs font-medium text-[#1D1D1D]  tracking-wider">
-                {user.role}
-              </td>
+          {isLoading ? (
+            <tr>
               <td
-                className={`p-4 text-xs font-medium tracking-wider ${getStatusColor(
-                  user.status
-                )}`}
+                colSpan={7}
+                className="p-8 text-center text-sm text-[#6C7788]"
               >
-                {user.status}
-              </td>
-              <td className="p-4 text-xs font-medium text-[#1D1D1D] tracking-wider">
-                {user.lastLogin}
-              </td>
-              <td className="flex items-center justify-start p-4 text-xs font-medium text-[#6c7788] tracking-wider">
-                <div className="flex items-center gap-4">
-                  <SquarePen
-                    size={18}
-                    className="cursor-pointer hover:text-blue-600 transition-colors"
-                  />
-                  <EyeIcon
-                    size={18}
-                    className="cursor-pointer hover:text-blue-600 transition-colors"
-                  />
-                  <Trash2
-                    size={18}
-                    className="cursor-pointer text-[#FE1A1A] hover:text-red-700 transition-colors"
-                  />
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="animate-spin text-[#71717A]" size={35} />
                 </div>
               </td>
             </tr>
-          ))}
+          ) : !allUser?.length ? (
+            <tr>
+              <td
+                colSpan={7}
+                className="p-8 text-center text-sm text-[#6C7788]"
+              >
+                No users found
+              </td>
+            </tr>
+          ) : (
+            allUser.map((user: UsersData) => (
+              <tr key={user._id}>
+                <td className="p-4 text-xs font-medium text-[#1D1D1D] tracking-wider">
+                  {formatUserId(user._id)}
+                </td>
+                <td className="p-4 text-xs font-medium text-[#1D1D1D] tracking-wider">
+                  {user.fullname}
+                </td>
+                <td className="p-4 text-xs font-medium text-[#1D1D1D] tracking-wider">
+                  {user.username}
+                </td>
+                <td className="p-4 text-xs font-medium text-[#1D1D1D] tracking-wider">
+                  {user.role.roleName}
+                </td>
+                <td
+                  className={`p-4 text-xs font-medium tracking-wider ${getStatusColor(
+                    user.status,
+                  )}`}
+                >
+                  {user.status.toUpperCase()}
+                </td>
+                <td className="p-4 text-xs font-medium text-[#1D1D1D] tracking-wider">
+                  {user.lastLogin
+                    ? formatDate(user.lastLogin)
+                    : "never logged in"}
+                </td>
+                <td className="flex items-center justify-start p-4 text-xs font-medium text-[#6c7788] tracking-wider">
+                  <div className="flex items-center gap-4">
+                    <SquarePen
+                      size={18}
+                      className="cursor-pointer hover:text-blue-600 transition-colors"
+                    />
+                    <EyeIcon
+                      size={18}
+                      className="cursor-pointer hover:text-blue-600 transition-colors"
+                      onClick={() => onViewClick(user)}
+                    />
+                    <Trash2
+                      size={18}
+                      className="cursor-pointer text-[#FE1A1A] hover:text-red-700 transition-colors"
+                      onClick={() => onDeleteClick(user)}
+                    />
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

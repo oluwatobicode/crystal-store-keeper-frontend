@@ -1,47 +1,28 @@
-import { Shield, SquarePen } from "lucide-react";
-import { useState } from "react";
+import { Loader2, Shield, SquarePen } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import CustomRulesModal from "../../ui/CustomRulesModal";
-
-const rolesData = [
-  {
-    role: "Admin",
-    description: "Full system access and user management",
-    permissions: ["all"],
-  },
-  {
-    role: "Manager",
-    description: "Sales, reports, and inventory management",
-    permissions: [
-      "pos.operate",
-      "reports.view",
-      "inventory.manage",
-      "cust.manage",
-      "trans.view",
-    ],
-  },
-  {
-    role: "Attendant",
-    description: "Point of sale and basic customer operations",
-    permissions: ["pos.operate", "customers.lookup", "transactions.own"],
-  },
-  {
-    role: "Inventory Clerk",
-    description: "Stock management and product catalog",
-    permissions: ["inventory.manage", "inventory.view"],
-  },
-  {
-    role: "Accountant",
-    description: "Financial reports and transaction reconciliation",
-    permissions: [
-      "reports.view",
-      "transactions.view",
-      "transactions.reconcile",
-    ],
-  },
-];
+import { useRoles } from "../../hooks/useRoles";
+import type { Roles } from "../../types/Roles";
+import toast from "react-hot-toast";
 
 const RolesPermission = () => {
   const [isRulesModalOpen, setIsRulesModalOpen] = useState<boolean>(false);
+
+  const { allRoles } = useRoles();
+  const isLoading = allRoles?.isLoading;
+  const userResponse = allRoles?.data?.data;
+
+  const { data: allRolesData } = userResponse || {};
+
+  console.log(allRolesData);
+
+  const hasToasted = useRef(false);
+  useEffect(() => {
+    if (userResponse?.message && !hasToasted.current) {
+      toast.success(userResponse.message);
+      hasToasted.current = true;
+    }
+  }, [userResponse]);
 
   return (
     <div className="flex flex-col w-full gap-[24px] px-[24px] h-auto py-[24px] bg-white ">
@@ -65,43 +46,56 @@ const RolesPermission = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-[24px]">
-        {rolesData.map((role, index) => (
-          <div
-            key={index}
-            className="w-full border border-[#E4E4E7] rounded-[12px] p-[24px] flex flex-col gap-[16px]"
-          >
-            <div className="flex flex-row justify-between items-start">
-              <div className="flex flex-col gap-[8px]">
-                <h2 className="text-[16px] font-medium text-[#1D1D1D]">
-                  {role.role}
-                </h2>
-                <p className="text-[12px] text-[#71717A] font-medium tracking-wide">
-                  {role.description}
-                </p>
-              </div>
-              <SquarePen
-                size={18}
-                className="text-[#71717A] cursor-pointer hover:text-black transition-colors"
-              />
-            </div>
-
-            <div className="flex flex-col gap-[12px] mt-2">
-              <h3 className="text-[12px] font-semibold text-[#1D1D1D]">
-                Permissions:
-              </h3>
-              <div className="flex flex-wrap gap-[8px]">
-                {role.permissions.map((perm, idx) => (
-                  <span
-                    key={idx}
-                    className="px-[12px] py-[4px] rounded-full border border-[#E4E4E7] text-[11px] font-medium text-black bg-white"
-                  >
-                    {perm}
-                  </span>
-                ))}
-              </div>
-            </div>
+        {isLoading ? (
+          <div className="col-span-2 flex items-center justify-center py-16">
+            <Loader2 className="animate-spin text-[#71717A]" size={35} />
           </div>
-        ))}
+        ) : !allRolesData?.length ? (
+          <div className="col-span-2 flex flex-col items-center justify-center py-16 gap-3">
+            <Shield size={40} className="text-[#E4E4E7]" />
+            <p className="text-[14px] text-[#71717A] font-medium">
+              No roles found
+            </p>
+          </div>
+        ) : (
+          allRolesData.map((role: Roles) => (
+            <div
+              key={role._id}
+              className="w-full border border-[#E4E4E7] rounded-[12px] p-[24px] flex flex-col gap-[16px]"
+            >
+              <div className="flex flex-row justify-between items-start">
+                <div className="flex flex-col gap-[8px]">
+                  <h2 className="text-[16px] font-medium text-[#1D1D1D]">
+                    {role.roleName}
+                  </h2>
+                  <p className="text-[12px] text-[#71717A] font-medium tracking-wide">
+                    {role.description}
+                  </p>
+                </div>
+                <SquarePen
+                  size={18}
+                  className="text-[#71717A] cursor-pointer hover:text-black transition-colors"
+                />
+              </div>
+
+              <div className="flex flex-col gap-[12px] mt-2">
+                <h3 className="text-[12px] font-semibold text-[#1D1D1D]">
+                  Permissions:
+                </h3>
+                <div className="flex flex-wrap gap-[8px]">
+                  {role.permissions.map((perm, idx) => (
+                    <span
+                      key={idx}
+                      className="px-[12px] py-[4px] rounded-full border border-[#E4E4E7] text-[11px] font-medium text-black bg-white"
+                    >
+                      {perm}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       <CustomRulesModal
