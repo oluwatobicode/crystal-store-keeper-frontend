@@ -14,16 +14,19 @@ import { BsBucketFill } from "react-icons/bs";
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../contexts/AuthProvider";
 import toast from "react-hot-toast";
+import { usePermission } from "../hooks/usePermissions";
 
 interface MenuItem {
   label: string;
   icon: React.ReactNode;
   href: string;
+  permission: string;
 }
 
 const Sidebar: React.FC = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { can } = usePermission();
 
   const handleLogout = async () => {
     try {
@@ -40,36 +43,57 @@ const Sidebar: React.FC = () => {
       label: "Dashboard",
       icon: <LayoutDashboard size={19} />,
       href: "/dashboard",
+      permission: "dashboard.view",
     },
     {
       label: "Sales / New Transaction",
       icon: <BsBucketFill size={19} />,
       href: "/sales",
+      permission: "pos.operate",
     },
-    { label: "Customers", icon: <Users size={19} />, href: "/customers" },
+    {
+      label: "Customers",
+      icon: <Users size={19} />,
+      href: "/customers",
+      permission: "customers.view",
+    },
     {
       label: "Products & Stock",
       icon: <Package size={19} />,
       href: "/products",
+      permission: "inventory.view",
     },
     {
       label: "Suppliers",
       icon: <Truck size={19} />,
       href: "/suppliers",
+      permission: "inventory.manage",
     },
     {
       label: "Payments & Transactions",
       icon: <CreditCard size={19} />,
       href: "/transactions",
+      permission: "transactions.view",
     },
-    { label: "Reports", icon: <FileText size={19} />, href: "/reports" },
-    { label: "Users & Roles", icon: <UserCog size={19} />, href: "/UserRoles" },
+    {
+      label: "Reports",
+      icon: <FileText size={19} />,
+      href: "/reports",
+      permission: "reports.view",
+    },
+    {
+      label: "Users & Roles",
+      icon: <UserCog size={19} />,
+      href: "/UserRoles",
+      permission: "users.manage",
+    },
     {
       label: "Settings & Backup",
       icon: <Settings size={19} />,
       href: "/settings",
+      permission: "settings.manage",
     },
-  ];
+  ].filter((item) => can(item.permission));
 
   return (
     <div className="bg-white h-screen w-full px-4 border-r border-gray-100 flex flex-col justify-between py-5">

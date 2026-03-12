@@ -1,6 +1,8 @@
 import { createContext, useContext, useReducer } from "react";
 import api, { setAuthToken } from "../api/api";
 import { isAxiosError } from "axios";
+import { useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 
 // user signs up with this data
 type UserSignUpData = {
@@ -15,6 +17,15 @@ type UserSignUpData = {
   ownerPassword: string;
   ownerPhone: string;
 };
+
+interface DecodedToken {
+  id: string;
+  email: string;
+  roleName: string;
+  businessId: string;
+  permissions: string[];
+  exp: number;
+}
 
 // user logs in with this data
 type UserLogInData = {
@@ -34,6 +45,8 @@ interface UserData {
   fullName: string;
   email: string;
   username: string;
+  permissions: string[];
+  roleName: string;
 }
 
 interface Business {
@@ -126,12 +139,14 @@ const authReducer = (state: AuthState, action: authAction) => {
         ...state,
         isLoading: false,
         isAuthenticated: true,
-        success: "Login successful'",
+        success: "Login successful",
         userData: {
           username: action.payload.username,
           email: action.payload.email,
           fullName: action.payload.fullName,
           id: action.payload.id,
+          permissions: action.payload.permissions,
+          roleName: action.payload.roleName,
         },
       };
 
@@ -168,6 +183,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+
+    if (!token) return;
+
+    try {
+      const decoded = jwtDecode<DecodedToken>(token);
+
+      // check if token is expired
+      const isExpired = decoded.exp * 1000 < Date.now();
+
+      if (isExpired) {
+        setAuthToken(null);
+        return;
+      }
+
+      // token is valid → rehydrate state
+      dispatch({
+        type: "AUTH_LOGGED_IN",
+        payload: {
+          id: decoded.id,
+          fullName: decoded.id,
+          email: decoded.email,
+          username: decoded.email,
+          permissions: decoded.permissions,
+          roleName: decoded.roleName,
+        },
+      });
+    } catch {
+      // token is malformed
+      setAuthToken(null);
+    }
+  }, []);
+
   // user logs in
   const login = async (loginData: UserLogInData) => {
     dispatch({ type: "AUTH_START" });
@@ -181,6 +230,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setAuthToken(token);
 
+      console.log(user);
+
       dispatch({
         type: "AUTH_LOGGED_IN",
         payload: {
@@ -188,6 +239,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           email: user.email,
           fullName: user.fullname,
           id: user._id,
+          roleName: user.role.roleName,
+          permissions: user.role.permissions,
         },
       });
 

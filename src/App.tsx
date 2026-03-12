@@ -48,14 +48,78 @@ function App() {
               }
             >
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/sales" element={<Sales />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/suppliers" element={<Suppliers />} />
-              <Route path="/customers" element={<Customers />} />
-              <Route path="/transactions" element={<Payments />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/UserRoles" element={<UserRoles />} />
+
+              <Route
+                path="/sales"
+                element={
+                  <ProtectedRoutes requiredPermission="pos.operate">
+                    <Sales />
+                  </ProtectedRoutes>
+                }
+              />
+
+              <Route
+                path="/products"
+                element={
+                  <ProtectedRoutes requiredPermission="inventory.view">
+                    <Products />
+                  </ProtectedRoutes>
+                }
+              />
+
+              <Route
+                path="/suppliers"
+                element={
+                  <ProtectedRoutes requiredPermission="inventory.manage">
+                    <Suppliers />
+                  </ProtectedRoutes>
+                }
+              />
+
+              <Route
+                path="/customers"
+                element={
+                  <ProtectedRoutes requiredPermission="customers.view">
+                    <Customers />
+                  </ProtectedRoutes>
+                }
+              />
+
+              <Route
+                path="/transactions"
+                element={
+                  <ProtectedRoutes requiredPermission="transactions.view">
+                    <Payments />
+                  </ProtectedRoutes>
+                }
+              />
+
+              <Route
+                path="/reports"
+                element={
+                  <ProtectedRoutes requiredPermission="reports.view">
+                    <Reports />
+                  </ProtectedRoutes>
+                }
+              />
+
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoutes requiredPermission="settings.manage">
+                    <Settings />
+                  </ProtectedRoutes>
+                }
+              />
+
+              <Route
+                path="/UserRoles"
+                element={
+                  <ProtectedRoutes requiredPermission="users.manage">
+                    <UserRoles />
+                  </ProtectedRoutes>
+                }
+              />
             </Route>
           </Routes>
         </BrowserRouter>
