@@ -3,13 +3,18 @@ import api from "../api/api";
 
 interface CreateProductData {
   name: string;
-  SKU: string;
   brand: string;
+  businessId?: string;
   location: string;
   unit: string;
+  SKU: string;
+  currentStock: number;
   reorderLevel: number;
   preferredStockLevel: number;
-  currentStock: number;
+  purchaseCost: number;
+  sellingPrice: number;
+  supplierId?: string;
+  isActive: boolean;
 }
 
 export const useProducts = () => {

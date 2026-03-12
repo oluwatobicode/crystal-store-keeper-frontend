@@ -11,6 +11,10 @@ import ProtectedRoutes from "./ui/ProtectedRoutes";
 import AppLayout from "./ui/AppLayout";
 import Products from "./Pages/Products";
 import Suppliers from "./Pages/Suppliers";
+import VerifyEmail from "./Pages/VerifyEmail";
+import ResetPassword from "./Pages/ResetPassword";
+import SignUp from "./Pages/SignUp";
+import VerifyOTP from "./Pages/VerifyOTP";
 import { AuthProvider } from "./contexts/AuthProvider";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -32,6 +36,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/verify-otp" element={<VerifyOTP />} />
             <Route
               element={
                 <ProtectedRoutes>

@@ -1,21 +1,21 @@
-import LoginForm from "../components/auth/LoginForm";
+import SignUpForm from "../components/auth/SignUpForm";
 
-const Login = () => {
+const SignUp = () => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-white">
       <div className="hidden md:flex md:w-1/2">
         <img
-          src="/login-image.png"
-          alt=""
+          src="/sign-up-image.png"
+          alt="Sign up illustration"
           className="w-full h-full object-cover"
         />
       </div>
 
       <div className="w-full md:w-1/2 flex items-center justify-center overflow-y-auto py-12 px-4">
-        <LoginForm />
+        <SignUpForm />
       </div>
     </div>
   );
 };
 
-export default Login;
+export default SignUp;

@@ -11,7 +11,9 @@ import {
   Truck,
 } from "lucide-react";
 import { BsBucketFill } from "react-icons/bs";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import { useAuth } from "../contexts/AuthProvider";
+import toast from "react-hot-toast";
 
 interface MenuItem {
   label: string;
@@ -20,6 +22,19 @@ interface MenuItem {
 }
 
 const Sidebar: React.FC = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out successfully");
+      navigate("/login");
+    } catch {
+      toast.error("Failed to logout");
+    }
+  };
+
   const menuItems: MenuItem[] = [
     {
       label: "Dashboard",
@@ -92,18 +107,18 @@ const Sidebar: React.FC = () => {
         </ul>
       </div>
 
-      <button className="w-full border-t border-gray-50 pt-5">
-        <NavLink
-          to="/login"
-          className="flex items-center gap-[9px] px-3 py-2 text-[#000000] hover:bg-red-50 hover:text-red-600 transition-all duration-200 rounded-[9px]"
-        >
+      <button
+        onClick={handleLogout}
+        className="w-full border-t border-gray-50 pt-5 text-left"
+      >
+        <div className="flex items-center gap-[9px] px-3 py-2 text-[#000000] hover:bg-red-50 hover:text-red-600 transition-all duration-200 rounded-[9px] cursor-pointer">
           <span className="shrink-0 flex items-center justify-center">
             <LogOut size={19} />
           </span>
-          <span className="text-[12px] cursor-pointer leading-[19.8px] font-medium">
+          <span className="text-[12px] leading-[19.8px] font-medium">
             Logout
           </span>
-        </NavLink>
+        </div>
       </button>
     </div>
   );

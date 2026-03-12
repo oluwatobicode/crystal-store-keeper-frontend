@@ -1,9 +1,12 @@
-import { Loader2, PackageOpen } from "lucide-react";
+import { Loader2, PackageOpen, Plus } from "lucide-react";
 import { useProducts } from "../../hooks/useProducts";
-import type { Products } from "../../types/Producst";
+import type { Products } from "../../types/Products";
+import { useState } from "react";
+import ProductModal from "../../ui/ProductModal";
 
 const AllProducts = () => {
   const { allProducts } = useProducts();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isLoading = allProducts?.isLoading;
   const productsResponse = allProducts?.data?.data;
@@ -11,6 +14,15 @@ const AllProducts = () => {
 
   return (
     <div className="flex flex-col gap-[16px] w-full">
+      <div className="flex justify-end">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-[#2474F5] text-white px-4 py-2 rounded-[8px] text-[13px] font-bold flex items-center gap-2 hover:bg-blue-600 transition-colors cursor-pointer shadow-sm"
+        >
+          <Plus size={18} />
+          Add Product
+        </button>
+      </div>
       {isLoading ? (
         <div className="flex items-center justify-center py-16">
           <Loader2 className="animate-spin text-[#71717A]" size={32} />
@@ -112,6 +124,10 @@ const AllProducts = () => {
           </div>
         ))
       )}
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };

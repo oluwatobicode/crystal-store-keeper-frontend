@@ -4,9 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../contexts/AuthProvider";
 import toast from "react-hot-toast";
+import { useState } from "react";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 const UserLoginSchema = z.object({
-  email: z.email(),
+  email: z.string().email("Please enter a valid email"),
   password: z.string().min(5, "Password must be at least 5 characters"),
 });
 
@@ -14,6 +16,7 @@ type LoginFormData = z.infer<typeof UserLoginSchema>;
 
 const LoginForm = () => {
   const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
   const {
@@ -33,113 +36,142 @@ const LoginForm = () => {
   };
 
   return (
-    <fieldset disabled={isSubmitting} className="contents">
-      <form
-        onSubmit={handleSubmit(handleLogin)}
-        className="flex flex-col justify-center border border-[#E2E4E9] items-center gap-6 w-full max-w-[484px] p-6 h-auto mx-4 bg-white rounded-[20px] shadow-[0px_0px_20px_rgba(0,_0,_0,_0.05)]"
-      >
-        <div className="flex flex-col w-full items-start">
-          <div className="flex w-full mb-5">
-            <img
-              src="Logo.svg"
-              className="h-auto max-w-[150px]"
-              alt="crystal-store-keeper-logo"
-            />
-          </div>
+    <div className="w-full max-w-[550px] p-8">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-[#1A1C21]">Login</h2>
+        <p className="text-[#71717A] mt-2">
+          Enter your credentials to access your account
+        </p>
+      </div>
 
-          <div className="flex flex-col space-y-3 mb-[32px]">
-            <h1 className="text-[26px] font-bold leading-[21.6px] tracking-normal">
-              Login
-            </h1>
-            <p className="text-[12px] font-normal text-[#71717A] tracking-normal leading-[23.4px]">
-              Enter your credentials to access your account
-            </p>
-          </div>
-        </div>
-
-        <div className="w-full space-y-4 flex flex-col">
-          <label
-            htmlFor="email"
-            className="text-[12px] font-medium text-[#71717A] tracking-[0.9px] leading-[16.2px]"
-          >
-            Email / Staff ID
-          </label>
-          <input
-            id="email"
-            className={`w-full h-[41px] placeholder:text-[12px] border outline-none rounded-[12px] transition-colors px-3 ${
-              errors.email ? "border-red-600" : " border-[#F2F2F2]"
-            }`}
-            type="text"
-            placeholder="email / staff id"
-            {...register("email")}
-          />
-          {errors.email && (
-            <p className="text-red-600 text-xs font-medium">
-              {errors.email.message}
-            </p>
-          )}
-        </div>
-
-        <div className="w-full space-y-4 flex flex-col">
-          <label
-            htmlFor="password"
-            className="text-[12px] font-medium text-[#71717A] tracking-[0.9px] leading-[16.2px]"
-          >
-            PIN / Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            placeholder="pin / password"
-            className={`w-full h-[41px] placeholder:text-[12px] border rounded-[12px] outline-none transition-colors px-3 ${
-              errors.password ? "border-red-600" : " border-[#F2F2F2]"
-            }`}
-            {...register("password")}
-          />
-          {errors.password && (
-            <p className="text-red-600 text-xs font-medium">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-
-        <div className="mt-5 w-full">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full text-white h-10 cursor-pointer border border-[#F2F2F2] bg-[#1A47FE] hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {isSubmitting ? (
-              <>
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-                Logging in...
-              </>
-            ) : (
-              "Login"
+      <fieldset disabled={isSubmitting} className="contents">
+        <form onSubmit={handleSubmit(handleLogin)} className="space-y-6">
+          <div className="space-y-2">
+            <label
+              htmlFor="email"
+              className="text-sm font-medium text-[#71717A]"
+            >
+              Email / Staff ID
+            </label>
+            <div className="relative">
+              <Mail
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717A]"
+                size={18}
+              />
+              <input
+                id="email"
+                className={`w-full h-11 pl-10 pr-4 border rounded-xl outline-none transition-all ${
+                  errors.email
+                    ? "border-red-500"
+                    : "border-[#E2E4E9] focus:border-[#1A47FE]"
+                }`}
+                type="text"
+                placeholder="email / staff id"
+                {...register("email")}
+              />
+            </div>
+            {errors.email && (
+              <p className="text-red-500 text-xs font-medium">
+                {errors.email.message}
+              </p>
             )}
-          </button>
-        </div>
-      </form>
-    </fieldset>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <label
+                htmlFor="password"
+                className="text-sm font-medium text-[#71717A]"
+              >
+                PIN / Password
+              </label>
+              <button
+                type="button"
+                className="text-[12px] cursor-pointer font-medium text-[#1A47FE] hover:underline"
+                onClick={() => navigate("/verify-email")}
+              >
+                Forgot Password?
+              </button>
+            </div>
+            <div className="relative">
+              <Lock
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717A]"
+                size={18}
+              />
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="pin / password"
+                className={`w-full h-11 pl-10 pr-10 border rounded-xl outline-none transition-all ${
+                  errors.password
+                    ? "border-red-500"
+                    : "border-[#E2E4E9] focus:border-[#1A47FE]"
+                }`}
+                {...register("password")}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A] hover:text-gray-700 transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-red-500 text-xs font-medium">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          <div className="pt-4 flex flex-col items-center gap-4">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full h-12 bg-[#1A47FE] text-white rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                  Logging in...
+                </>
+              ) : (
+                "Login"
+              )}
+            </button>
+            <p className="text-sm font-normal text-[#71717A]">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                className="text-[#1A47FE] cursor-pointer font-medium hover:underline"
+                onClick={() => navigate("/signup")}
+              >
+                Sign up
+              </button>
+            </p>
+          </div>
+        </form>
+      </fieldset>
+    </div>
   );
 };
 

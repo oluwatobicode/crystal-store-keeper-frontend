@@ -9,7 +9,7 @@ type UserSignUpData = {
   businessPhone: string;
   businessAddress: string;
   businessLogo?: string;
-  ownerfullname: string;
+  ownerFullname: string;
   ownerUsername: string;
   ownerEmail: string;
   ownerPassword: string;
@@ -64,13 +64,20 @@ type AuthState = {
 
 type AuthContextAction = {
   state: AuthState;
-  signup: (data: UserSignUpData) => void;
+  signup: (
+    data: UserSignUpData,
+  ) => Promise<{ success: boolean; message: string }>;
   login: (
     data: UserLogInData,
   ) => Promise<{ success: boolean; message: string }>;
-  otp: (data: otpInput) => void;
+  otp: (data: otpInput) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   checkAuthStatus: () => void;
+  resetLink: (email: string) => Promise<{ success: boolean; message: string }>;
+  resetPassword: (
+    token: string,
+    newPassword: string,
+  ) => Promise<{ success: boolean; message: string }>;
 };
 
 const initialState: AuthState = {
@@ -198,16 +205,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const signup = async (signupData: UserSignUpData) => {
     dispatch({ type: "AUTH_START" });
     try {
-      const response = await api.post("/auth/signup", signupData);
-
-      console.log(response);
+      const response = await api.post("/auth/sign-up", signupData);
 
       dispatch({
         type: "AUTH_SIGNED_UP",
         payload: response.data,
       });
+      return {
+        success: true,
+        message: response.data.message || "Sign up successful",
+      };
     } catch (error) {
-      console.log(error);
+      const message = isAxiosError(error)
+        ? error?.response?.data.message || "Something went wrong"
+        : "An unexpected error occurred";
+      dispatch({ type: "ERROR", payload: message });
+      return { success: false, message };
     }
   };
 
@@ -236,24 +249,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const response = await api.post("/auth/verify-otp", otpData);
 
-      console.log(response);
-
-      // dispatch({
-      //   type: "AUTH_LOGGED_IN",
-      //   payload: {
-      //     username: response.data.user.username,
-      //     email: response.data.user.email,
-      //     fullName: response.data.user.fullname,
-      //     id: response.data.user._id,
-      //   },
-      // });
+      return {
+        success: true,
+        message: response.data.message || "Verification successful",
+      };
     } catch (error) {
-      if (isAxiosError(error)) {
-        const message = error?.response?.data.message || "Something went wrong";
-        dispatch({ type: "ERROR", payload: message });
-      } else {
-        dispatch({ type: "ERROR", payload: "An unexpected error occurred" });
-      }
+      const message = isAxiosError(error)
+        ? error?.response?.data.message || "Something went wrong"
+        : "An unexpected error occurred";
+      dispatch({ type: "ERROR", payload: message });
+      return { success: false, message };
     }
   };
 
@@ -272,6 +277,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const resetLink = async (email: string) => {
+    dispatch({ type: "AUTH_START" });
+    try {
+      const response = await api.post("/auth/reset-link", { email });
+      return {
+        success: true,
+        message: response.data.message || "Kindly check your mail",
+      };
+    } catch (error) {
+      const message = isAxiosError(error)
+        ? error?.response?.data.message || "Something went wrong"
+        : "An unexpected error occurred";
+      dispatch({ type: "ERROR", payload: message });
+      return { success: false, message };
+    }
+  };
+
+  // user resets password
+  const resetPassword = async (token: string, newPassword: string) => {
+    dispatch({ type: "AUTH_START" });
+    try {
+      const response = await api.post("/auth/reset-password", {
+        token,
+        newPassword,
+      });
+      return {
+        success: true,
+        message: response.data.message || "Password reset successful",
+      };
+    } catch (error) {
+      const message = isAxiosError(error)
+        ? error?.response?.data.message || "Something went wrong"
+        : "An unexpected error occurred";
+      dispatch({ type: "ERROR", payload: message });
+      return { success: false, message };
+    }
+  };
+
   const value: AuthContextAction = {
     state,
     login,
@@ -279,6 +322,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     logout,
     otp,
     checkAuthStatus,
+    resetLink,
+    resetPassword,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
