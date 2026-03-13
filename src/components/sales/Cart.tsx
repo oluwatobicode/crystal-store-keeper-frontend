@@ -1,20 +1,11 @@
 import { Trash2, Minus, Plus } from "lucide-react";
-import { type CartItem } from "../../Pages/Sales";
+import { useSale } from "../../contexts/SaleContext";
 
-interface CartProps {
-  items: CartItem[];
-  onUpdateQuantity: (id: string, delta: number) => void;
-  onRemoveItem: (id: string) => void;
-  onUpdateDiscount: (id: string, discount: number) => void;
-}
+const Cart = () => {
+  const { cartItems, updateQuantity, removeFromCart, updateItemDiscount } =
+    useSale();
 
-const Cart = ({
-  items,
-  onUpdateQuantity,
-  onRemoveItem,
-  onUpdateDiscount,
-}: CartProps) => {
-  if (items.length === 0) {
+  if (cartItems.length === 0) {
     return (
       <div className="p-[20px] h-full border-r border-[#E4E4E7] flex flex-col gap-[16px]">
         <h1 className="text-[16px] font-medium leading-[16.2px] -tracking-[0.1px]">
@@ -32,26 +23,31 @@ const Cart = ({
   return (
     <div className="p-[20px] h-full border-r border-[#E4E4E7] flex flex-col gap-[24px] overflow-y-auto">
       <h1 className="text-[16px] font-medium leading-[16.2px] -tracking-[0.1px]">
-        Cart ({items.length})
+        Cart ({cartItems.length})
       </h1>
 
       <div className="flex flex-col gap-[16px]">
-        {items.map((item) => {
-          const subtotal = item.price * item.quantity;
+        {cartItems.map((item) => {
+          const subtotal = item.sellingPrice * item.quantity;
           const discountAmount = subtotal * (item.discount / 100);
           const total = subtotal - discountAmount;
 
           return (
             <div
-              key={item.id}
+              key={item._id}
               className="bg-white border border-[#E4E4E7] rounded-[8px] p-[16px] flex flex-col gap-[16px]"
             >
               <div className="flex justify-between items-start">
-                <h3 className="text-[13px] font-bold text-[#1D1D1D] uppercase max-w-[80%]">
-                  {item.name}
-                </h3>
+                <div className="flex flex-col gap-1 max-w-[80%]">
+                  <h3 className="text-[13px] font-bold text-[#1D1D1D] uppercase">
+                    {item.name}
+                  </h3>
+                  <p className="text-[11px] text-[#71717A] font-medium">
+                    {item.SKU}
+                  </p>
+                </div>
                 <button
-                  onClick={() => onRemoveItem(item.id)}
+                  onClick={() => removeFromCart(item._id)}
                   className="text-[#EF4444] hover:bg-red-50 p-1 rounded transition-colors"
                 >
                   <Trash2 size={14} />
@@ -61,7 +57,7 @@ const Cart = ({
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => onUpdateQuantity(item.id, -1)}
+                    onClick={() => updateQuantity(item._id, -1)}
                     className="w-[24px] h-[24px] border border-[#E4E4E7] rounded-[4px] flex items-center justify-center hover:bg-gray-50"
                   >
                     <Minus size={12} />
@@ -70,7 +66,7 @@ const Cart = ({
                     {item.quantity}
                   </span>
                   <button
-                    onClick={() => onUpdateQuantity(item.id, 1)}
+                    onClick={() => updateQuantity(item._id, 1)}
                     className="w-[24px] h-[24px] border border-[#E4E4E7] rounded-[4px] flex items-center justify-center hover:bg-gray-50"
                   >
                     <Plus size={12} />
@@ -78,7 +74,7 @@ const Cart = ({
                 </div>
 
                 <span className="text-[11px] font-medium text-[#71717A] uppercase">
-                  ₦{item.price.toFixed(2)} EACH
+                  ₦{item.sellingPrice.toLocaleString()} EACH
                 </span>
               </div>
 
@@ -94,7 +90,7 @@ const Cart = ({
                       max="100"
                       value={item.discount}
                       onChange={(e) =>
-                        onUpdateDiscount(item.id, Number(e.target.value))
+                        updateItemDiscount(item._id, Number(e.target.value))
                       }
                       className="w-[40px] h-[24px] bg-[#F4F4F5] rounded-[4px] text-center text-[11px] outline-none focus:ring-1 ring-[#1A47FE]"
                     />
@@ -105,7 +101,7 @@ const Cart = ({
                 </div>
 
                 <span className="text-[14px] font-bold text-[#1D1D1D]">
-                  ₦{total.toFixed(2)}
+                  ₦{total.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -115,4 +111,5 @@ const Cart = ({
     </div>
   );
 };
+
 export default Cart;

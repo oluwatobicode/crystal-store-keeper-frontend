@@ -1,63 +1,60 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Scan, Search, User } from "lucide-react";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import z from "zod";
-import { type Product } from "../../Pages/Sales";
+import { useState, useMemo } from "react";
+import { Search, User, Scan, X } from "lucide-react";
+import { useProducts } from "../../hooks/useProducts";
+import { useCustomers } from "../../hooks/useCustomers";
+import { useSale } from "../../contexts/SaleContext";
+import type { Products as Product } from "../../types/Products";
+import type { Customer } from "../../types/Customers";
 
-const newSaleSchema = z.object({
-  customerName: z.string().min(1, "Customer name is required"),
-  customerPhone: z.string().min(10, "Invalid phone number").optional(),
-  customerAddress: z
-    .string()
-    .min(5, "Address must be at least 5 chars")
-    .optional(),
-});
+const NewSale = () => {
+  const { addToCart, setCustomer, selectedCustomer } = useSale();
+  const { allProducts } = useProducts();
+  const { allCustomers } = useCustomers();
 
-type NewSaleFormData = z.infer<typeof newSaleSchema>;
+  const [productSearch, setProductSearch] = useState("");
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [showCustomerResults, setShowCustomerResults] = useState(false);
 
-const searchResults: Product[] = [
-  {
-    id: "P001",
-    name: "PREMIUM WHITE PAINT 5L",
-    sku: "P001 • 5L",
-    price: 45.99,
-    stock: 15,
-  },
-  {
-    id: "P002",
-    name: "BLUE EMULSION 2.5L",
-    sku: "P002 • 2.5L",
-    price: 20.99,
-    stock: 22,
-  },
-];
+  // --- Filtering Logic ---
+  const products = useMemo(
+    () => allProducts?.data?.data?.data || [],
+    [allProducts],
+  );
+  const customers = useMemo(
+    () => allCustomers?.data?.data?.data || [],
+    [allCustomers],
+  );
 
-interface NewSaleProps {
-  onAddToCart: (product: Product) => void;
-}
+  const filteredProducts = useMemo(() => {
+    if (!productSearch) return products?.slice(0, 4); // Show some defaults
+    const search = productSearch.toLowerCase();
+    return products.filter(
+      (p: Product) =>
+        p.name.toLowerCase().includes(search) ||
+        p.SKU.toLowerCase().includes(search),
+    );
+  }, [products, productSearch]);
 
-const NewSale = ({ onAddToCart }: NewSaleProps) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<NewSaleFormData>({
-    resolver: zodResolver(newSaleSchema),
-  });
-
-  const onSubmit: SubmitHandler<NewSaleFormData> = (data) => {
-    console.log(data);
-  };
+  const filteredCustomers = useMemo(() => {
+    if (!customerSearch) return [];
+    const search = customerSearch.toLowerCase();
+    return customers.filter(
+      (c: Customer) =>
+        c.fullname.toLowerCase().includes(search) || c.phone.includes(search),
+    );
+  }, [customers, customerSearch]);
 
   return (
     <div className="p-[20px] h-full flex flex-col space-y-[24px] overflow-y-auto pb-10 border-r border-[#E4E4E7]">
+      {/* Header */}
       <div className="flex justify-between items-center bg-white p-[16px] rounded-[8px] border border-[#E4E4E7]">
         <div className="flex flex-col gap-[4px]">
           <h1 className="text-[16px] font-medium text-black tracking-[-0.1px] leading-[16.2px]">
             New Sale
           </h1>
           <p className="text-[#71717A] text-left font-medium text-[12px] tracking-[0.9px] leading-[16.2px] uppercase">
-            Invoice #JCC-20250817-0001
+            Invoice #JCC-
+            {new Date().toISOString().slice(0, 10).replace(/-/g, "")}
           </p>
         </div>
         <span className="bg-[#FAFAFB] text-[#71717A] text-[10px] font-bold px-2 py-1 rounded border border-[#E4E4E7]">
@@ -65,72 +62,84 @@ const NewSale = ({ onAddToCart }: NewSaleProps) => {
         </span>
       </div>
 
+      {/* Customer Selection */}
       <div className="flex flex-col space-y-[24px] bg-white p-[24px] rounded-[8px] border border-[#E4E4E7]">
-        <div className="flex gap-[8px] items-center">
-          <User className="text-[#1D1D1D]" size={20} />
-          <h2 className="text-[18px] font-medium text-[#71717A] tracking-[-0.1px]">
-            Customer Information
-          </h2>
+        <div className="flex justify-between items-center">
+          <div className="flex gap-[8px] items-center">
+            <User className="text-[#1D1D1D]" size={20} />
+            <h2 className="text-[18px] font-medium text-[#71717A] tracking-[-0.1px]">
+              Customer Information
+            </h2>
+          </div>
+          {selectedCustomer && (
+            <button
+              onClick={() => setCustomer(null)}
+              className="text-[#EF4444] text-[12px] font-medium flex items-center gap-1"
+            >
+              <X size={14} /> Clear
+            </button>
+          )}
         </div>
 
-        <form
-          className="flex flex-col gap-[16px]"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <div className="w-full">
-            <label className="text-black text-[12px] font-semibold tracking-[-0.1px] block">
-              Customer Name *
-            </label>
-
-            <input
-              type="text"
-              placeholder="Enter customer name"
-              className="w-full outline-none text-[13px] h-[40px] rounded-[8px] border border-[#E4E4E7] mt-[8px] px-[12px] placeholder:text-[#A1A1AA] focus:border-[#1A47FE] transition-colors"
-              {...register("customerName")}
-            />
-            {errors.customerName && (
-              <p className="text-red-500 text-[11px] mt-1">
-                {errors.customerName.message}
+        {selectedCustomer ? (
+          <div className="p-4 bg-[#FAFAFB] rounded-lg border border-[#E4E4E7] flex justify-between items-center">
+            <div>
+              <p className="text-[14px] font-bold text-[#1D1D1D] uppercase">
+                {selectedCustomer.fullname}
               </p>
+              <p className="text-[12px] text-[#71717A]">
+                {selectedCustomer.phone}
+              </p>
+            </div>
+            <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2 py-1 rounded uppercase">
+              {selectedCustomer.customerType}
+            </span>
+          </div>
+        ) : (
+          <div className="relative">
+            <label className="text-black text-[12px] font-semibold tracking-[-0.1px] block mb-2">
+              Find Existing Customer
+            </label>
+            <div className="relative">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]"
+                size={16}
+              />
+              <input
+                type="text"
+                placeholder="Search by name or phone..."
+                value={customerSearch}
+                onFocus={() => setShowCustomerResults(true)}
+                onChange={(e) => setCustomerSearch(e.target.value)}
+                className="w-full outline-none pl-10 text-[13px] h-[40px] rounded-[8px] border border-[#E4E4E7] focus:border-[#1A47FE] transition-colors"
+              />
+            </div>
+
+            {showCustomerResults && filteredCustomers.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-[#E4E4E7] rounded-lg shadow-lg max-h-[200px] overflow-y-auto">
+                {filteredCustomers.map((c: Customer) => (
+                  <div
+                    key={c._id}
+                    onClick={() => {
+                      setCustomer(c);
+                      setCustomerSearch("");
+                      setShowCustomerResults(false);
+                    }}
+                    className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-0"
+                  >
+                    <p className="text-[13px] font-bold text-[#1D1D1D]">
+                      {c.fullname}
+                    </p>
+                    <p className="text-[11px] text-[#71717A]">{c.phone}</p>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
-
-          <div className="w-full">
-            <label className="text-black text-[12px] font-semibold tracking-[-0.1px] block">
-              Phone Number
-            </label>
-            <input
-              type="text"
-              placeholder="Optional phone number"
-              className="w-full outline-none text-[13px] h-[40px] rounded-[8px] border border-[#E4E4E7] mt-[8px] px-[12px] placeholder:text-[#A1A1AA] focus:border-[#1A47FE] transition-colors"
-              {...register("customerPhone")}
-            />
-            {errors.customerPhone && (
-              <p className="text-red-500 text-[11px] mt-1">
-                {errors.customerPhone.message}
-              </p>
-            )}
-          </div>
-
-          <div className="w-full">
-            <label className="text-black text-[12px] font-semibold tracking-[-0.1px] block">
-              Address
-            </label>
-            <input
-              type="text"
-              placeholder="Optional address"
-              className="w-full outline-none text-[13px] h-[40px] rounded-[8px] border border-[#E4E4E7] mt-[8px] px-[12px] placeholder:text-[#A1A1AA] focus:border-[#1A47FE] transition-colors"
-              {...register("customerAddress")}
-            />
-            {errors.customerAddress && (
-              <p className="text-red-500 text-[11px] mt-1">
-                {errors.customerAddress.message}
-              </p>
-            )}
-          </div>
-        </form>
+        )}
       </div>
 
+      {/* Product Search */}
       <div className="flex flex-col space-y-[24px] bg-white p-[24px] rounded-[8px] border border-[#E4E4E7]">
         <div>
           <h2 className="text-[18px] font-medium text-[#71717A] tracking-[-0.1px]">
@@ -150,6 +159,8 @@ const NewSale = ({ onAddToCart }: NewSaleProps) => {
               />
               <input
                 type="text"
+                value={productSearch}
+                onChange={(e) => setProductSearch(e.target.value)}
                 className="w-full outline-none pl-10 text-[13px] h-[40px] rounded-[8px] border border-[#E4E4E7] focus:border-[#1A47FE] transition-colors"
                 placeholder="Search products or SKU..."
               />
@@ -180,22 +191,23 @@ const NewSale = ({ onAddToCart }: NewSaleProps) => {
         </div>
       </div>
 
+      {/* Product Results */}
       <div className="flex flex-col gap-[12px]">
-        {searchResults.map((item) => (
+        {filteredProducts.map((item: Product) => (
           <div
-            key={item.id}
-            onClick={() => onAddToCart(item)}
-            className="w-full p-[20px] bg-white border border-[#E4E4E7] rounded-[8px] flex items-start justify-between hover:border-[#1A47FE] cursor-pointer transition-colors group"
+            key={item._id}
+            onClick={() => addToCart(item)}
+            className="w-full p-[16px] bg-white border border-[#E4E4E7] rounded-[8px] flex items-start justify-between hover:border-[#1A47FE] cursor-pointer transition-colors group"
           >
             <div className="flex flex-col gap-[4px]">
               <h3 className="text-[13px] font-bold text-[#1D1D1D] uppercase tracking-[-0.1px]">
                 {item.name}
               </h3>
               <p className="text-[#71717A] text-[11px] tracking-[0.5px]">
-                {item.sku}
+                {item.SKU}
               </p>
               <p className="text-[#22C55E] text-[13px] font-bold tracking-[-0.1px] pt-1">
-                ₦{item.price.toFixed(2)}
+                ₦{item.sellingPrice.toLocaleString()}
               </p>
             </div>
 
@@ -203,12 +215,21 @@ const NewSale = ({ onAddToCart }: NewSaleProps) => {
               <span className="text-[10px] uppercase font-bold text-[#71717A]">
                 Stock
               </span>
-              <span className="text-[13px] font-bold text-[#22C55E]">
-                {item.stock}
+              <span
+                className={`text-[13px] font-bold ${
+                  item.currentStock > 0 ? "text-[#22C55E]" : "text-red-500"
+                }`}
+              >
+                {item.currentStock}
               </span>
             </div>
           </div>
         ))}
+        {filteredProducts.length === 0 && (
+          <p className="text-center text-[12px] text-[#71717A] py-4">
+            No products found matching "{productSearch}"
+          </p>
+        )}
       </div>
     </div>
   );

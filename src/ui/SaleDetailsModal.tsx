@@ -7,9 +7,11 @@ import {
   Hash,
   Info,
   Loader2,
+  LayoutDashboard,
 } from "lucide-react";
-import { useSales } from "../hooks/useSales";
+import { useSaleById } from "../hooks/useSales";
 import { format } from "date-fns";
+import { jsPDF } from "jspdf";
 
 interface SaleDetailsModalProps {
   isOpen: boolean;
@@ -29,9 +31,140 @@ const SaleDetailsModal = ({
   onClose,
   saleId,
 }: SaleDetailsModalProps) => {
-  const { getSaleById } = useSales();
-  const { data: saleData, isLoading } = getSaleById(saleId);
+  // const { useSaleById } = useSaleById();
+  const { data: saleData, isLoading } = useSaleById(saleId);
   const sale = saleData?.data;
+
+  const handleDownloadReceipt = () => {
+    if (!sale) return;
+
+    const doc = new jsPDF({ unit: "mm", format: "a5" });
+    const pageW = doc.internal.pageSize.getWidth();
+    let y = 20;
+
+    const center = (text: string, yPos: number, size = 10) => {
+      doc.setFontSize(size);
+      doc.text(text, pageW / 2, yPos, { align: "center" });
+    };
+
+    const line = () => {
+      doc.setDrawColor(220, 220, 220);
+      doc.line(15, y, pageW - 15, y);
+      y += 5;
+    };
+
+    // Header
+    doc.setFont("helvetica", "bold");
+    center("CRYSTAL STORE KEEPER", y, 14);
+    y += 7;
+    doc.setFont("helvetica", "normal");
+    center("Official Receipt", y, 10);
+    y += 5;
+    center(format(new Date(sale.createdAt), "dd MMM yyyy, HH:mm"), y, 9);
+    y += 8;
+    line();
+
+    // Invoice & Customer
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text("Invoice ID:", 15, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(sale.invoiceId, 60, y);
+    y += 5;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Customer:", 15, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(
+      `${sale.customerSnapshot.name} | ${sale.customerSnapshot.phone}`,
+      60,
+      y,
+    );
+    y += 5;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Sales Person:", 15, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(sale.salesPersonId.fullname, 60, y);
+    y += 8;
+    line();
+
+    // Items header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("Product", 15, y);
+    doc.text("Qty", 100, y);
+    doc.text("Unit Price", 115, y);
+    doc.text("Total", 150, y);
+    y += 4;
+    line();
+
+    // Items rows
+    doc.setFont("helvetica", "normal");
+    sale.items.forEach((item) => {
+      doc.text(item.productName, 15, y);
+      doc.text(String(item.quantity), 100, y);
+      doc.text(formatCurrency(item.unitPrice), 115, y);
+      doc.text(formatCurrency(item.total), 150, y);
+      y += 6;
+    });
+    y += 2;
+    line();
+
+    // Summary
+    doc.text(`Subtotal:`, 100, y);
+    doc.text(formatCurrency(sale.subTotal), 150, y);
+    y += 5;
+
+    if (sale.discountAmount > 0) {
+      doc.text("Discount:", 100, y);
+      doc.text(`-${formatCurrency(sale.discountAmount)}`, 150, y);
+      y += 5;
+    }
+
+    doc.text(`VAT (${(sale.vatRate * 100).toFixed(1)}%):`, 100, y);
+    doc.text(formatCurrency(sale.vatAmount), 150, y);
+    y += 5;
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Grand Total:", 100, y);
+    doc.text(formatCurrency(sale.grandTotal), 150, y);
+    y += 5;
+
+    doc.setFont("helvetica", "normal");
+    doc.text("Amount Paid:", 100, y);
+    doc.text(formatCurrency(sale.amountPaid), 150, y);
+    y += 5;
+
+    if (sale.amountPaid < sale.grandTotal) {
+      doc.text("Balance Due:", 100, y);
+      doc.text(formatCurrency(sale.grandTotal - sale.amountPaid), 150, y);
+      y += 5;
+    }
+
+    y += 3;
+    line();
+
+    // Payment methods
+    doc.setFont("helvetica", "bold");
+    doc.text("Payment Methods:", 15, y);
+    y += 5;
+    doc.setFont("helvetica", "normal");
+    sale.payments.forEach((p) => {
+      doc.text(
+        `${p.method.replace("_", " ").toUpperCase()} — ${formatCurrency(p.amount)}${p.reference ? ` (Ref: ${p.reference})` : ""}`,
+        15,
+        y,
+      );
+      y += 5;
+    });
+
+    y += 5;
+    doc.setFont("helvetica", "italic");
+    center("Thank you for your business!", y, 9);
+
+    doc.save(`Receipt-${sale.invoiceId}.pdf`);
+  };
 
   if (!isOpen) return null;
 
@@ -273,7 +406,14 @@ const SaleDetailsModal = ({
         </div>
 
         {/* Footer */}
-        <div className="p-[20px] bg-[#F9FAFB] border-t border-[#F4F4F5] flex justify-end rounded-b-[12px]">
+        <div className="p-[20px] bg-[#F9FAFB] border-t border-[#F4F4F5] flex justify-between rounded-b-[12px]">
+          <button
+            onClick={handleDownloadReceipt}
+            disabled={!sale || isLoading}
+            className="px-6 py-2 bg-[#1A47FE] text-white rounded-[8px] text-[13px] font-bold hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50"
+          >
+            Download Receipt
+          </button>
           <button
             onClick={onClose}
             className="px-6 py-2 bg-white border border-[#E2E4E9] rounded-[8px] text-[13px] font-bold text-[#1D1D1D] hover:bg-gray-50 transition-colors cursor-pointer"
@@ -285,9 +425,5 @@ const SaleDetailsModal = ({
     </div>
   );
 };
-
-// Mock LayoutDashboard for now since I forgot to import it if it's not and actually it is LayoutDashboard from lucide-react.
-// Wait, I missed importing LayoutDashboard.
-import { LayoutDashboard } from "lucide-react";
 
 export default SaleDetailsModal;
