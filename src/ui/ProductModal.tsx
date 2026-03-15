@@ -76,7 +76,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* Name */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Product Name *
+                Product Name <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 {...register("name")}
@@ -93,7 +93,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* Brand */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Brand *
+                Brand <span className="text-red-400">*</span>
               </label>
               <input
                 {...register("brand")}
@@ -110,7 +110,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* SKU */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                SKU *
+                SKU <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 {...register("SKU")}
@@ -127,7 +127,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* Location */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Location *
+                Location <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 {...register("location")}
@@ -144,7 +144,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* Unit */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Unit *
+                Unit <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 {...register("unit")}
@@ -161,7 +161,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* Supplier */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Supplier (Optional)
+                Supplier <span className="text-red-500 font-bold">*</span>
               </label>
               <select
                 {...register("supplierId")}
@@ -183,7 +183,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* Purchase Cost */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Purchase Cost *
+                Purchase Cost <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 type="number"
@@ -200,7 +200,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* Selling Price */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Selling Price *
+                Selling Price <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 type="number"
@@ -217,7 +217,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* Current Stock */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Initial Stock *
+                Initial Stock <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 type="number"
@@ -234,7 +234,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* Reorder Level */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Reorder Level *
+                Reorder Level <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 type="number"
@@ -251,7 +251,8 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
             {/* Preferred Stock level */}
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Preferred Level *
+                Preferred Level{" "}
+                <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 type="number"

@@ -99,7 +99,7 @@ const SupplierModal = ({
         >
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-medium text-[#1D1D1D]">
-              Supplier Name *
+              Supplier Name <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("name")}
@@ -115,7 +115,7 @@ const SupplierModal = ({
 
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-medium text-[#1D1D1D]">
-              Contact Person *
+              Contact Person <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("contactPerson")}
@@ -132,7 +132,7 @@ const SupplierModal = ({
           <div className="grid grid-cols-2 gap-[16px]">
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Phone *
+                Phone <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 {...register("phone")}
@@ -148,7 +148,7 @@ const SupplierModal = ({
 
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Email *
+                Email <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 {...register("email")}
@@ -165,7 +165,7 @@ const SupplierModal = ({
 
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-medium text-[#1D1D1D]">
-              Address *
+              Address <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("address")}

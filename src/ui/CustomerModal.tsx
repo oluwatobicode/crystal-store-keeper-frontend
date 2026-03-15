@@ -100,7 +100,7 @@ const CustomerModal = ({
         >
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-medium text-[#1D1D1D]">
-              Full Name *
+              Full Name <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("fullName")}
@@ -116,7 +116,7 @@ const CustomerModal = ({
 
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-medium text-[#1D1D1D]">
-              Email *
+              Email <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("emailAddress")}
@@ -132,7 +132,7 @@ const CustomerModal = ({
 
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-medium text-[#1D1D1D]">
-              Phone *
+              Phone <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("phoneNumber")}
@@ -148,7 +148,7 @@ const CustomerModal = ({
 
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-medium text-[#1D1D1D]">
-              Address
+              Address <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("address")}
@@ -165,7 +165,7 @@ const CustomerModal = ({
           <div className="flex gap-[16px]">
             <div className="flex-1 flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Customer Type
+                Customer Type <span className="text-red-500 font-bold">*</span>
               </label>
               <select
                 {...register("customerType")}
@@ -178,7 +178,8 @@ const CustomerModal = ({
 
             <div className="flex-1 flex flex-col gap-[8px]">
               <label className="text-[13px] font-medium text-[#1D1D1D]">
-                Credit Limit (£)
+                Credit Limit (£){" "}
+                <span className="text-red-500 font-bold">*</span>
               </label>
               <input
                 type="number"

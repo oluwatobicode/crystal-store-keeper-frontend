@@ -117,7 +117,7 @@ const UserModal = ({ isOpen, onClose, userToEdit }: UserModalProps) => {
         >
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-bold text-[#1D1D1D]">
-              Full Name
+              Full Name <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("fullname")}
@@ -133,7 +133,7 @@ const UserModal = ({ isOpen, onClose, userToEdit }: UserModalProps) => {
 
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-bold text-[#1D1D1D]">
-              Email
+              Email <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("email")}
@@ -149,7 +149,7 @@ const UserModal = ({ isOpen, onClose, userToEdit }: UserModalProps) => {
 
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-bold text-[#1D1D1D]">
-              Username
+              Username <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("username")}
@@ -165,7 +165,7 @@ const UserModal = ({ isOpen, onClose, userToEdit }: UserModalProps) => {
 
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-bold text-[#1D1D1D]">
-              Select a Role
+              Select a Role <span className="text-red-500 font-bold">*</span>
             </label>
             <select
               {...register("role")}
@@ -187,7 +187,7 @@ const UserModal = ({ isOpen, onClose, userToEdit }: UserModalProps) => {
 
           <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-bold text-[#1D1D1D]">
-              Contact Number (Optional)
+              Contact Number <span className="text-red-500 font-bold">*</span>
             </label>
             <input
               {...register("contactNumber")}
@@ -199,7 +199,7 @@ const UserModal = ({ isOpen, onClose, userToEdit }: UserModalProps) => {
           {isEditMode && (
             <div className="flex flex-col gap-[8px]">
               <label className="text-[13px] font-bold text-[#1D1D1D]">
-                Status
+                Status <span className="text-red-500 font-bold">*</span>
               </label>
               <select
                 {...register("status")}
@@ -217,7 +217,7 @@ const UserModal = ({ isOpen, onClose, userToEdit }: UserModalProps) => {
               <div className="flex flex-col gap-[8px]">
                 <div className="flex justify-between items-center">
                   <label className="text-[13px] font-bold text-[#1D1D1D]">
-                    Password
+                    Password <span className="text-red-500 font-bold">*</span>
                   </label>
                   <button
                     type="button"
@@ -246,7 +246,8 @@ const UserModal = ({ isOpen, onClose, userToEdit }: UserModalProps) => {
 
               <div className="flex flex-col gap-[8px]">
                 <label className="text-[13px] font-bold text-[#1D1D1D]">
-                  Confirm Password
+                  Confirm Password{" "}
+                  <span className="text-red-500 font-bold">*</span>
                 </label>
                 <input
                   type="text"
