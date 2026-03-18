@@ -5,8 +5,10 @@ import AuditLogsSettings from "./AuditLogsSettings";
 import BackupSettings from "./BackupSettings";
 import SystemSettings from "./SystemSettings";
 import TelegramSettings from "./TelegramSettings";
+import ProfileSettings from "./ProfileSettings";
 
 const settingsTabs = [
+  { tab: "Profile" },
   { tab: "Business" },
   { tab: "Invoice" },
   { tab: "System" },
@@ -18,7 +20,7 @@ const settingsTabs = [
 type SettingsTabType = (typeof settingsTabs)[number]["tab"];
 
 const SettingsTabs = () => {
-  const [currentTab, setCurrentTab] = useState<SettingsTabType>("Business");
+  const [currentTab, setCurrentTab] = useState<SettingsTabType>("Profile");
 
   return (
     <div className="flex flex-col gap-[24px]">
@@ -38,6 +40,7 @@ const SettingsTabs = () => {
         ))}
       </div>
 
+      {currentTab === "Profile" && <ProfileSettings />}
       {currentTab === "Business" && <BusinessSettings />}
       {currentTab === "Invoice" && <InvoiceSettings />}
       {currentTab === "System" && <SystemSettings />}
@@ -49,3 +52,4 @@ const SettingsTabs = () => {
 };
 
 export default SettingsTabs;
+

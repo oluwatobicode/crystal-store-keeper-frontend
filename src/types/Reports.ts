@@ -32,4 +32,5 @@ export interface StockMovementByProduct {
   totalReceived: number;
   totalDeducted: number;
   netChange: number;
+  currentStock: number;
 }

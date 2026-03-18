@@ -152,27 +152,6 @@ const BusinessSettings = () => {
           )}
         </div>
 
-        <div className="flex flex-row items-center gap-[16px]">
-          <div className="flex-1 max-w-[919px]">
-            <label className="block font-medium leading-[16.2px] tracking-[0.9px] text-[13px]">
-              Store logo
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              {...register("storeLogo")}
-              className="w-full mt-[8px] font-medium leading-[16.2px] tracking-[-0.1px] text-[13px] bg-[#FAFAFB] outline-none h-[43px] rounded-[8px] border border-[#E2E4E9] px-[12px] py-[8px] pt-[10px]"
-            />
-          </div>
-
-          <button
-            type="button"
-            className="bg-[#1A47FE] text-white cursor-pointer w-[104px] h-[43px] font-medium leading-[16.2px] rounded-[8px] tracking-[0.9px] text-[10px] mt-[24px] hover:bg-blue-700 transition-colors"
-          >
-            Upload Logo
-          </button>
-        </div>
-
         <div className="pt-[10px] flex justify-end">
           <button
             type="submit"

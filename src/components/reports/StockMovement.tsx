@@ -41,7 +41,7 @@ const StockMovement = () => {
 
   return (
     <div className="w-full bg-white p-[24px] h-auto min-h-[300px]">
-      <h2 className="uppercase font-medium text-[20px] mb-8 tracking-[0.9px] leading-[16.2px] text-[#71717A]">
+      <h2 className="font-semibold text-[20px] mb-8 text-[#1D1D1D]">
         Stock Movement Report
       </h2>
 
@@ -84,10 +84,10 @@ const StockMovement = () => {
                   </div>
                   <div className="flex flex-col gap-1">
                     <span className="text-[18px] font-bold text-[#1D1D1D]">
-                      {item.totalMovements} movements
+                      {item.totalMovements.toLocaleString()} {item.movementType === 'sale' ? 'sales transactions' : 'transactions'}
                     </span>
                     <span className="text-[12px] font-medium text-[#71717A]">
-                      Qty change:{" "}
+                      {item.movementType === 'sale' ? 'Items sold' : item.movementType === 'receive' ? 'Items received' : 'Items adjusted'}:{" "}
                       <span
                         className={
                           item.totalQuantityChange >= 0
@@ -96,7 +96,7 @@ const StockMovement = () => {
                         }
                       >
                         {item.totalQuantityChange > 0 ? "+" : ""}
-                        {item.totalQuantityChange}
+                        {item.totalQuantityChange.toLocaleString()}
                       </span>
                     </span>
                   </div>
@@ -105,56 +105,60 @@ const StockMovement = () => {
             })}
           </div>
 
-          <table className="w-full text-left">
-            <thead className="border-b border-[#E1E4EA]">
-              <tr>
-                {[
-                  "Product",
-                  "Movements",
-                  "Received",
-                  "Deducted",
-                  "Net Change",
-                ].map((head) => (
-                  <th
-                    key={head}
-                    className="p-4 text-xs font-medium text-[#6C7788] tracking-wider"
-                  >
-                    {head}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#E1E4EA]">
-              {byProduct.map((row: StockMovementByProduct, index: number) => (
-                <tr key={index}>
-                  <td className="p-4 text-xs font-medium text-[#1D1D1D]">
-                    {row.productName}
-                  </td>
-                  <td className="p-4 text-xs font-medium text-[#6C7788]">
-                    {row.totalMovements}
-                  </td>
-                  <td className="p-4 text-xs font-medium text-green-600">
-                    {row.totalReceived > 0
-                      ? `+${row.totalReceived}`
-                      : row.totalReceived}
-                  </td>
-                  <td className="p-4 text-xs font-medium text-red-500">
-                    {row.totalDeducted}
-                  </td>
-                  <td className="p-4 text-xs font-bold">
-                    <span
-                      className={
-                        row.netChange >= 0 ? "text-green-600" : "text-red-500"
-                      }
+          <div className="overflow-x-auto w-full">
+            <table className="w-full text-left min-w-[600px]">
+              <thead className="border-b border-[#E1E4EA]">
+                <tr>
+                  {[
+                    "Product",
+                    "Received",
+                    "Deducted",
+                    "Net Change",
+                    "Current Stock",
+                  ].map((head) => (
+                    <th
+                      key={head}
+                      className="p-4 text-xs font-medium text-[#6C7788] tracking-wider whitespace-nowrap"
                     >
-                      {row.netChange > 0 ? "+" : ""}
-                      {row.netChange}
-                    </span>
-                  </td>
+                      {head}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-[#E1E4EA]">
+                {byProduct.map((row: StockMovementByProduct, index: number) => (
+                  <tr key={index}>
+                    <td className="p-4 text-xs font-medium text-[#1D1D1D] whitespace-nowrap">
+                      {row.productName}
+                    </td>
+                    <td className="p-4 text-xs font-medium text-green-600 whitespace-nowrap">
+                      {row.totalReceived > 0
+                        ? `+${row.totalReceived.toLocaleString()}`
+                        : row.totalReceived.toLocaleString()}
+                    </td>
+                    <td className="p-4 text-xs font-medium text-red-500 whitespace-nowrap">
+                      {row.totalDeducted > 0
+                        ? `-${row.totalDeducted.toLocaleString()}`
+                        : row.totalDeducted.toLocaleString()}
+                    </td>
+                    <td className="p-4 text-xs font-bold whitespace-nowrap">
+                      <span
+                        className={
+                          row.netChange >= 0 ? "text-green-600" : "text-red-500"
+                        }
+                      >
+                        {row.netChange > 0 ? "+" : ""}
+                        {row.netChange.toLocaleString()}
+                      </span>
+                    </td>
+                    <td className="p-4 text-xs font-medium text-[#1D1D1D] whitespace-nowrap">
+                      {row.currentStock !== undefined ? row.currentStock.toLocaleString() : '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
