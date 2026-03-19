@@ -123,12 +123,12 @@ const authReducer = (state: AuthState, action: authAction) => {
         success: "Sign up successful, kindly check mail for otp",
         userSignedUpData: {
           business: {
-            businessName: action.payload.business.businessName,
-            businessEmail: action.payload.business.businessEmail,
+            businessName: action.payload.business?.businessName,
+            businessEmail: action.payload.business?.businessEmail,
           },
           owner: {
-            fullname: action.payload.owner.fullname,
-            email: action.payload.owner.email,
+            fullname: action.payload.owner?.fullname,
+            email: action.payload.owner?.email,
             username: action.payload.owner.username,
           },
         },

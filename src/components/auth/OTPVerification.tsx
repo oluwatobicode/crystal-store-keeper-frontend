@@ -63,8 +63,16 @@ const OTPVerification = () => {
 
   return (
     <div className="w-full max-w-[484px] p-8 flex flex-col items-center">
+      <div className="flex items-center justify-center w-full mb-5">
+        <img
+          src="Logo.svg"
+          className="h-auto max-w-[150px]"
+          alt="crystal-store-keeper-logo"
+        />
+      </div>
+
       <div className="w-full mb-8 text-center">
-        <h2 className="text-3xl font-bold text-[#1A1C21]">Verify your email</h2>
+        <h2 className="text-sm font-bold text-[#1A1C21]">Verify your email</h2>
         <p className="text-[#71717A] mt-2">
           We've sent a 6-digit code to{" "}
           <span className="font-semibold text-[#1A1C21]">{email}</span>
@@ -85,25 +93,27 @@ const OTPVerification = () => {
               value={value}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className="w-12 h-14 md:w-14 md:h-16 text-center text-2xl font-bold border-2 border-[#E2E4E9] rounded-xl outline-none transition-all focus:border-[#1A47FE] focus:ring-1 focus:ring-[#1A47FE]"
+              className="w-12 h-14 md:w-14 md:h-16 text-center text-xl font-bold border  border-[#E2E4E9] rounded-xl outline-none transition-all "
             />
           ))}
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full h-12 bg-[#1A47FE] text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Verifying..." : "Verify OTP"}
-        </button>
+        <div className="flex items-center justify-center">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-[300px] max-w-full h-12 bg-[#1A47FE] text-white rounded-full cursor-pointer font-semibold hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "Verifying..." : "Verify OTP"}
+          </button>
+        </div>
 
         <div className="text-center">
           <p className="text-[#71717A] text-sm">
             Didn't receive the code?{" "}
             <button
               type="button"
-              className="text-[#1A47FE] font-medium hover:underline"
+              className="text-[#1A47FE] cursor-pointer font-medium hover:underline"
             >
               Resend code
             </button>
