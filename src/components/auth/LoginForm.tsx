@@ -1,18 +1,11 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
-import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../contexts/AuthProvider";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-
-const UserLoginSchema = z.object({
-  email: z.string().email("Please enter a valid email"),
-  password: z.string().min(5, "Password must be at least 5 characters"),
-});
-
-type LoginFormData = z.infer<typeof UserLoginSchema>;
+import { UserLoginSchema, type LoginFormData } from "../../types/Login";
 
 const LoginForm = () => {
   const { login } = useAuth();
