@@ -66,8 +66,6 @@ const CustomerModal = ({
   }, [initialData, reset, setValue]);
 
   const onSubmit = async (data: CustomerFormData) => {
-    // Simulate API Call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log(isEditMode ? "Updated Customer:" : "Created Customer:", data);
     onSave(data);
     onClose();
