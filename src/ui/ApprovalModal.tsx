@@ -29,7 +29,7 @@ const ApprovalModal = ({ onClose, onApprove }: ApprovalModalProps) => {
   });
 
   const handleApprove: SubmitHandler<approveFormSchema> = (data) => {
-    console.log("Authorized:", data);
+   
     if (onApprove) onApprove(data);
   };
 

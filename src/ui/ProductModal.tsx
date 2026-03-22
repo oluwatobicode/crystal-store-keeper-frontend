@@ -42,7 +42,7 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
       onClose();
     } catch (error) {
       toast.error("Failed to create product");
-      console.log(error);
+   
     }
   };
 

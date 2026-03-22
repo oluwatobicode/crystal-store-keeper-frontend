@@ -1,4 +1,4 @@
-import { X, Mail, Phone, MapPin, Calendar, ShoppingCart } from "lucide-react";
+import { X, Mail, Phone, MapPin, Calendar } from "lucide-react";
 import type { Customer } from "../types/Customers";
 import { formatCurrency } from "../utils/formatCurrency";
 
@@ -14,15 +14,6 @@ const CustomerModalDetails = ({
   customer,
 }: CustomerDetailsProps) => {
   if (!isOpen || !customer) return null;
-
-  const mockDetails = {
-    recentTransactions: [
-      { id: "INV-001", items: 3, amount: "₦245.50", date: "1/14/2024" },
-      { id: "INV-001", items: 3, amount: "₦245.50", date: "1/14/2024" },
-      { id: "INV-001", items: 3, amount: "₦245.50", date: "1/14/2024" },
-      { id: "INV-001", items: 3, amount: "₦245.50", date: "1/14/2024" },
-    ],
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 ">
@@ -137,36 +128,6 @@ const CustomerModalDetails = ({
             <h3 className="text-[14px] font-bold text-[#1D1D1D]">
               Recent Transactions
             </h3>
-            <div className="bg-white rounded-[12px] overflow-hidden">
-              {mockDetails.recentTransactions.map((tx, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between p-[16px] border-b border-[#F4F4F5] hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-[#1D1D1D]">
-                      <ShoppingCart size={14} />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[13px] font-bold text-[#1D1D1D]">
-                        {tx.id}
-                      </span>
-                      <span className="text-[12px] text-[#71717A] font-medium">
-                        {tx.items} items
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <span className="text-[13px] font-bold text-[#1D1D1D]">
-                      {tx.amount}
-                    </span>
-                    <span className="text-[12px] text-[#71717A] font-medium">
-                      {tx.date}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

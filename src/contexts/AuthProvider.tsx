@@ -230,7 +230,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setAuthToken(token);
 
-      console.log(user);
+      
 
       dispatch({
         type: "AUTH_LOGGED_IN",
@@ -282,7 +282,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const response = await api.post("/auth/logout");
 
-      console.log(response);
+    
       dispatch({
         type: "LOGOUT",
       });
