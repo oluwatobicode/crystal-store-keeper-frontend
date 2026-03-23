@@ -167,9 +167,6 @@ const AllCustomers = ({ onEditClick, onViewClick }: AllCustomersProps) => {
                   >
                     Edit
                   </button>
-                  <button className="bg-[#F8F8F8] cursor-pointer text-[#71717A] text-[12px] font-medium px-6 py-2 rounded-[8px]">
-                    Create Sale
-                  </button>
                 </div>
               </div>
             </div>

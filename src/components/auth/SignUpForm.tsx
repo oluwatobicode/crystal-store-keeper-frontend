@@ -340,7 +340,7 @@ const SignUpForm = () => {
         </AnimatePresence>
 
         <p className="text-sm text-center font-normal text-[#71717A]">
-          Have have an account?{" "}
+          Have an account?{" "}
           <button
             type="button"
             className="text-[#1A47FE] cursor-pointer font-medium hover:underline"

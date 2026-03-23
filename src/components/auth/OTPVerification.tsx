@@ -4,13 +4,14 @@ import { useAuth } from "../../contexts/AuthProvider";
 import toast from "react-hot-toast";
 
 const OTPVerification = () => {
-  const { otp } = useAuth();
+  const { otp, resendOtp } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email;
 
   const [otpValues, setOtpValues] = useState(["", "", "", "", "", ""]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -56,6 +57,19 @@ const OTPVerification = () => {
     if (result.success) {
       toast.success(result.message);
       navigate("/login");
+    } else {
+      toast.error(result.message);
+    }
+  };
+
+  const handleResend = async () => {
+    if (!email || isResending) return;
+    setIsResending(true);
+    const result = await resendOtp(email);
+    setIsResending(false);
+    
+    if (result.success) {
+      toast.success(result.message);
     } else {
       toast.error(result.message);
     }
@@ -113,9 +127,11 @@ const OTPVerification = () => {
             Didn't receive the code?{" "}
             <button
               type="button"
-              className="text-[#1A47FE] cursor-pointer font-medium hover:underline"
+              onClick={handleResend}
+              disabled={isResending}
+              className="text-[#1A47FE] cursor-pointer font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Resend code
+              {isResending ? "Resending..." : "Resend code"}
             </button>
           </p>
         </div>

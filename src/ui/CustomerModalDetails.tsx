@@ -1,4 +1,4 @@
-import { X, Mail, Phone, MapPin, Calendar } from "lucide-react";
+import { X, Mail, Phone, MapPin } from "lucide-react";
 import type { Customer } from "../types/Customers";
 import { formatCurrency } from "../utils/formatCurrency";
 
@@ -107,7 +107,7 @@ const CustomerModalDetails = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-[16px]">
+          {/* <div className="grid grid-cols-3 gap-[16px]">
             {[1, 2, 3].map((_, i) => (
               <div
                 key={i}
@@ -122,13 +122,13 @@ const CustomerModalDetails = ({
                 </span>
               </div>
             ))}
-          </div>
+          </div> */}
 
-          <div className="flex flex-col gap-[12px]">
+          {/* <div className="flex flex-col gap-[12px]">
             <h3 className="text-[14px] font-bold text-[#1D1D1D]">
               Recent Transactions
             </h3>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

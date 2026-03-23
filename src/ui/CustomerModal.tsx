@@ -66,7 +66,6 @@ const CustomerModal = ({
   }, [initialData, reset, setValue]);
 
   const onSubmit = async (data: CustomerFormData) => {
-    console.log(isEditMode ? "Updated Customer:" : "Created Customer:", data);
     onSave(data);
     onClose();
   };

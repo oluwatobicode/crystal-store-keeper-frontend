@@ -91,6 +91,7 @@ type AuthContextAction = {
     token: string,
     newPassword: string,
   ) => Promise<{ success: boolean; message: string }>;
+  resendOtp: (email: string) => Promise<{ success: boolean; message: string }>;
 };
 
 const initialState: AuthState = {
@@ -100,6 +101,38 @@ const initialState: AuthState = {
   isLoading: false,
   success: null,
   error: null,
+};
+
+const getInitialState = (): AuthState => {
+  const token = localStorage.getItem("jwt");
+
+  if (!token) return initialState;
+
+  try {
+    const decoded = jwtDecode<DecodedToken>(token);
+    const isExpired = decoded.exp * 1000 < Date.now();
+
+    if (isExpired) {
+      return initialState;
+    }
+
+    setAuthToken(token);
+
+    return {
+      ...initialState,
+      isAuthenticated: true,
+      userData: {
+        id: decoded.id,
+        fullName: decoded.id,
+        email: decoded.email,
+        username: decoded.email,
+        permissions: decoded.permissions,
+        roleName: decoded.roleName,
+      },
+    };
+  } catch {
+    return initialState;
+  }
 };
 
 type authAction =
@@ -181,39 +214,27 @@ const AuthContext = createContext<AuthContextAction | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  const [state, dispatch] = useReducer(authReducer, getInitialState());
 
   useEffect(() => {
     const token = localStorage.getItem("jwt");
 
-    if (!token) return;
+    if (!token) {
+      setAuthToken(null);
+      return;
+    }
 
     try {
       const decoded = jwtDecode<DecodedToken>(token);
-
-      // check if token is expired
       const isExpired = decoded.exp * 1000 < Date.now();
 
       if (isExpired) {
         setAuthToken(null);
-        return;
+        dispatch({ type: "LOGOUT" });
       }
-
-      // token is valid → rehydrate state
-      dispatch({
-        type: "AUTH_LOGGED_IN",
-        payload: {
-          id: decoded.id,
-          fullName: decoded.id,
-          email: decoded.email,
-          username: decoded.email,
-          permissions: decoded.permissions,
-          roleName: decoded.roleName,
-        },
-      });
     } catch {
-      // token is malformed
       setAuthToken(null);
+      dispatch({ type: "LOGOUT" });
     }
   }, []);
 
@@ -229,8 +250,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const { token, user } = response.data.data;
 
       setAuthToken(token);
-
-      
 
       dispatch({
         type: "AUTH_LOGGED_IN",
@@ -280,12 +299,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // user logs out
   const logout = async () => {
     try {
-      const response = await api.post("/auth/logout");
-
-    
-      dispatch({
-        type: "LOGOUT",
-      });
+      await api.post("/auth/logout");
     } catch (error) {
       if (isAxiosError(error)) {
         const message = error?.response?.data.message || "Something went wrong";
@@ -293,6 +307,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         dispatch({ type: "ERROR", payload: "An unexpected error occurred" });
       }
+    } finally {
+      setAuthToken(null);
+      dispatch({
+        type: "LOGOUT",
+      });
     }
   };
 
@@ -347,6 +366,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  // resend otp
+  const resendOtp = async (email: string) => {
+    dispatch({ type: "AUTH_START" });
+    try {
+      const response = await api.post("/auth/resend-otp", { email });
+      return {
+        success: true,
+        message: response.data.message || "OTP resent successfully",
+      };
+    } catch (error) {
+      const message = isAxiosError(error)
+        ? error?.response?.data.message || "Something went wrong"
+        : "An unexpected error occurred";
+      dispatch({ type: "ERROR", payload: message });
+      return { success: false, message };
+    }
+  };
+
   // user resets password
   const resetPassword = async (token: string, newPassword: string) => {
     dispatch({ type: "AUTH_START" });
@@ -377,6 +414,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     checkAuthStatus,
     resetLink,
     resetPassword,
+    resendOtp,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

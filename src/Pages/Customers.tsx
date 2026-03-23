@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router";
 import toast from "react-hot-toast";
 import AllCustomers from "../components/customers/AllCustomers";
 import CustomerData from "../components/customers/CustomerAnalytics";
@@ -8,6 +9,9 @@ import type { Customer } from "../types/Customers";
 import { useCustomers } from "../hooks/useCustomers";
 
 const Customers = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const customerIdParam = searchParams.get("customerId");
+
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingCustomer, setEditingCustomer] =
     useState<CustomerFormData | null>(null);
@@ -15,12 +19,17 @@ const Customers = () => {
     null,
   );
 
-  const [viewCustomer, setViewCustomer] = useState<Customer | null>(null);
+  const { createCustomer, updateCustomer, allCustomers } = useCustomers();
+  const customersResponse = allCustomers?.data?.data;
+  const customers: Customer[] = customersResponse?.data || [];
 
-  const { createCustomer, updateCustomer } = useCustomers();
+  const viewCustomer = useMemo(() => {
+    if (!customerIdParam || !customers.length) return null;
+    return customers.find((c) => c.customerId === customerIdParam || c._id === customerIdParam) || null;
+  }, [customerIdParam, customers]);
 
   const handleViewDetails = (customer: Customer) => {
-    setViewCustomer(customer);
+    setSearchParams({ customerId: customer.customerId });
   };
 
   const handleAddNew = () => {
@@ -87,7 +96,7 @@ const Customers = () => {
       {viewCustomer && (
         <CustomerModalDetails
           isOpen={!!viewCustomer}
-          onClose={() => setViewCustomer(null)}
+          onClose={() => setSearchParams({})}
           customer={viewCustomer}
         />
       )}

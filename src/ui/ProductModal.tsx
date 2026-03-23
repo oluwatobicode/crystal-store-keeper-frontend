@@ -40,9 +40,8 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
       toast.success("Product created successfully");
       reset();
       onClose();
-    } catch (error) {
-      toast.error("Failed to create product");
-   
+    } catch (error: any) {
+      toast.error(error.response.data.message);
     }
   };
 

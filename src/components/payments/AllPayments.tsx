@@ -9,6 +9,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useState, useMemo } from "react";
+import { useSearchParams } from "react-router";
 import { useSales } from "../../hooks/useSales";
 import type { Sale } from "../../types/SalesRecord";
 import SaleDetailsModal from "../../ui/SaleDetailsModal";
@@ -24,8 +25,8 @@ const formatCurrency = (amount: number) => {
 const AllPayments = () => {
   const { allSales } = useSales();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const transactionId = searchParams.get("transactionId");
 
   const sales = allSales.data?.data || [];
   const isLoading = allSales.isLoading;
@@ -44,8 +45,7 @@ const AllPayments = () => {
   }, [sales, searchQuery]);
 
   const handleViewDetails = (id: string) => {
-    setSelectedSaleId(id);
-    setIsModalOpen(true);
+    setSearchParams({ transactionId: id });
   };
 
   return (
@@ -145,9 +145,9 @@ const AllPayments = () => {
       </div>
 
       <SaleDetailsModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        saleId={selectedSaleId}
+        isOpen={!!transactionId}
+        onClose={() => setSearchParams({})}
+        saleId={transactionId}
       />
     </div>
   );

@@ -5,7 +5,6 @@ import {
   Banknote,
   CreditCard,
   Smartphone,
-  Save,
   FileCheck,
   X,
 } from "lucide-react";
@@ -403,15 +402,6 @@ const PaymentCheckout = () => {
             </>
           )}
         </button>
-
-        <div className="grid grid-cols-2 gap-[12px]">
-          <button className="h-[40px] flex items-center justify-center gap-2 rounded-[8px] border border-[#E4E4E7] bg-white hover:bg-gray-50 text-[12px] font-medium text-[#1D1D1D]">
-            <Save size={14} /> Save Draft
-          </button>
-          <button className="h-[40px] flex items-center justify-center gap-2 rounded-[8px] border border-[#E4E4E7] bg-white hover:bg-gray-50 text-[12px] font-medium text-[#1D1D1D]">
-            <FileCheck size={14} /> Request Approval
-          </button>
-        </div>
       </div>
     </div>
   );

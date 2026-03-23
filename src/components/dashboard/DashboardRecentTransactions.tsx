@@ -4,6 +4,7 @@ import { formatCurrency } from "../../utils/formatCurrency";
 import { formatDate } from "../../utils/formatDate";
 import type { SaleRecord } from "../../types/SalesRecord";
 import { getStyle } from "../../utils/getStyle";
+import { useNavigate } from "react-router";
 
 const DashboardRecentTransactions = () => {
   const { recentSales } = useDashboard();
@@ -11,6 +12,8 @@ const DashboardRecentTransactions = () => {
   const isLoading = recentSales?.isLoading;
   const recentSalesData = recentSales?.data?.data;
   const { data: salesData } = recentSalesData || {};
+
+  const navigate = useNavigate();
 
   return (
     <div className="w-full bg-white border border-[#E2E4E9] h-auto px-5 py-10 rounded-[9px]">
@@ -73,7 +76,12 @@ const DashboardRecentTransactions = () => {
         </div>
 
         <div className="mt-[28px] w-full">
-          <button className="px-7 bg-[#F8F8F8] hover:bg-gray-100 transition-colors py-5 text-[#71717A] font-medium leading-[16.2px] tracking-[0.9px] text-center cursor-pointer w-full rounded-lg">
+          <button
+            onClick={() => {
+              navigate("/transactions");
+            }}
+            className="px-7 bg-[#F8F8F8] hover:bg-gray-100 transition-colors py-5 text-[#71717A] font-medium leading-[16.2px] tracking-[0.9px] text-center cursor-pointer w-full rounded-lg"
+          >
             View All Transactions
           </button>
         </div>

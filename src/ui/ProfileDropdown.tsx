@@ -30,7 +30,7 @@ const menuItems = [
     icon: ClipboardList,
     label: "Activity Logs",
     description: "View recent activity",
-    path: "/logs",
+    path: "/settings",
   },
 ];
 
@@ -81,7 +81,11 @@ const ProfileDropdown = ({ isOpen, onClose }: ProfileDropdownProps) => {
           <div className="relative shrink-0">
             <div className="w-11 h-11 rounded-full overflow-hidden bg-[#1A47FE] flex items-center justify-center text-white text-[14px] font-bold select-none">
               {profile?.avatarUrl ? (
-                <img src={profile.avatarUrl} alt={profile.fullName} className="w-full h-full object-cover" />
+                <img
+                  src={profile.avatarUrl}
+                  alt={profile.fullName}
+                  className="w-full h-full object-cover"
+                />
               ) : user?.fullName ? (
                 getInitials(user.fullName)
               ) : (
