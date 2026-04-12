@@ -23,7 +23,11 @@ interface MenuItem {
   permission: string;
 }
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  collapsed: boolean;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { can } = usePermission();
@@ -96,23 +100,39 @@ const Sidebar: React.FC = () => {
   ].filter((item) => can(item.permission));
 
   return (
-    <div className="bg-white h-screen w-full px-4 border-r border-gray-100 flex flex-col justify-between py-5">
-      <div className="flex flex-col items-center">
-        <div className="mb-[50px]">
-          <img
-            src="Logo.svg"
-            className="w-[141px] h-[17px]"
-            alt="crystal-store-keeper"
-          />
+    <div
+      className={`bg-white h-screen w-full border-r border-gray-100 flex flex-col justify-between py-5 transition-all duration-300 ${
+        collapsed ? "px-2 items-center" : "px-4"
+      }`}
+    >
+      <div className={`flex flex-col ${collapsed ? "items-center" : "items-center"}`}>
+        <div className={`mb-[50px] transition-all duration-300 overflow-hidden ${collapsed ? "w-[28px]" : "w-[141px]"}`}>
+          {collapsed ? (
+            <img
+              src="Logo.svg"
+              className="w-[141px] h-[17px]"
+              alt="crystal-store-keeper"
+              style={{ objectFit: "cover", objectPosition: "left" }}
+            />
+          ) : (
+            <img
+              src="Logo.svg"
+              className="w-[141px] h-[17px]"
+              alt="crystal-store-keeper"
+            />
+          )}
         </div>
 
-        <ul className="flex flex-col items-start gap-[10px] w-full">
+        <ul className={`flex flex-col items-start gap-[10px] w-full`}>
           {menuItems.map((item, index) => (
             <li key={index} className="w-full">
               <NavLink
                 to={item.href}
+                title={collapsed ? item.label : undefined}
                 className={({ isActive }: { isActive: boolean }) =>
                   `flex items-center gap-[9px] px-3 py-2 transition-all duration-200 ${
+                    collapsed ? "justify-center" : ""
+                  } ${
                     isActive
                       ? "bg-[#EDEDFB] rounded-[9px] text-[#1A47FE]"
                       : "text-[#000000] hover:bg-gray-50 rounded-[9px]"
@@ -122,9 +142,11 @@ const Sidebar: React.FC = () => {
                 <span className="shrink-0 flex items-center justify-center">
                   {item.icon}
                 </span>
-                <span className="text-[12px] leading-[19.8px] tracking-normal font-medium">
-                  {item.label}
-                </span>
+                {!collapsed && (
+                  <span className="text-[12px] leading-[19.8px] tracking-normal font-medium whitespace-nowrap">
+                    {item.label}
+                  </span>
+                )}
               </NavLink>
             </li>
           ))}
@@ -135,13 +157,20 @@ const Sidebar: React.FC = () => {
         onClick={handleLogout}
         className="w-full border-t border-gray-50 pt-5 text-left"
       >
-        <div className="flex items-center gap-[9px] px-3 py-2 text-[#000000] hover:bg-red-50 hover:text-red-600 transition-all duration-200 rounded-[9px] cursor-pointer">
+        <div
+          title={collapsed ? "Logout" : undefined}
+          className={`flex items-center gap-[9px] px-3 py-2 text-[#000000] hover:bg-red-50 hover:text-red-600 transition-all duration-200 rounded-[9px] cursor-pointer ${
+            collapsed ? "justify-center" : ""
+          }`}
+        >
           <span className="shrink-0 flex items-center justify-center">
             <LogOut size={19} />
           </span>
-          <span className="text-[12px] leading-[19.8px] font-medium">
-            Logout
-          </span>
+          {!collapsed && (
+            <span className="text-[12px] leading-[19.8px] font-medium">
+              Logout
+            </span>
+          )}
         </div>
       </button>
     </div>
@@ -149,3 +178,4 @@ const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
+

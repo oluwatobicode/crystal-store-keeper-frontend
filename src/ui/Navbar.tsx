@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Menu, PanelLeftOpen, Search, User } from "lucide-react";
 import NotificationDropdown from "./NotificationDropdown";
 import ProfileDropdown from "./ProfileDropdown";
 import { useNotifications } from "../hooks/useNotification";
@@ -7,7 +7,12 @@ import { useAuth } from "../contexts/AuthProvider";
 import { useProfile } from "../hooks/useProfile";
 import { getInitials } from "../utils/getInitials";
 
-const Navbar = () => {
+interface NavbarProps {
+  onToggleSidebar: () => void;
+  sidebarCollapsed: boolean;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, sidebarCollapsed }) => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { notificationCount } = useNotifications();
@@ -20,14 +25,30 @@ const Navbar = () => {
 
   return (
     <div className="flex w-full items-center justify-between bg-white border-b-2 border-[#E4E4E7] px-5 py-5">
-      <div className="relative w-full max-w-[763.5px]">
-        <Search className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-400 pointer-events-none" />
+      <div className="flex items-center gap-3 w-full max-w-[800px]">
+        {/* Sidebar toggle button */}
+        <button
+          onClick={onToggleSidebar}
+          className="shrink-0 flex items-center justify-center h-[40px] w-[40px] rounded-[10px] hover:bg-[#EDEDFB] transition-all duration-200 cursor-pointer group"
+          aria-label="Toggle sidebar"
+          id="sidebar-toggle-btn"
+        >
+          {sidebarCollapsed ? (
+            <PanelLeftOpen size={20} className="text-gray-600 group-hover:text-[#1A47FE] transition-colors" />
+          ) : (
+            <Menu size={20} className="text-gray-600 group-hover:text-[#1A47FE] transition-colors" />
+          )}
+        </button>
 
-        <input
-          type="text"
-          placeholder="Type to search"
-          className="h-[45.24px] w-full rounded-[11.31px] border border-[#E4E4E7] pl-10 pr-4 outline-none transition-colors focus:border-gray-400"
-        />
+        <div className="relative w-full max-w-[763.5px]">
+          <Search className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-400 pointer-events-none" />
+
+          <input
+            type="text"
+            placeholder="Type to search"
+            className="h-[45.24px] w-full rounded-[11.31px] border border-[#E4E4E7] pl-10 pr-4 outline-none transition-colors focus:border-gray-400"
+          />
+        </div>
       </div>
 
       <div className="flex items-center gap-[17px]">
