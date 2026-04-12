@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://crystal-store-keeper-backend.onrender.com/api/v1";
+const BASE_URL = "https://api.crystalstore.oluwatobii.xyz/api/v1";
 
 const api = axios.create({
   baseURL: BASE_URL,
