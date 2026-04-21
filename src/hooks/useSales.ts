@@ -31,7 +31,7 @@ export const useSales = () => {
     mutationFn: async (saleData: {
       items: { productId: string; quantity: number }[];
       payments: {
-        method: "cash" | "pos" | "bank_transfer";
+        method: "cash" | "pos" | "bank_transfer" | "credit";
         amount: number;
         reference: string | null;
       }[];

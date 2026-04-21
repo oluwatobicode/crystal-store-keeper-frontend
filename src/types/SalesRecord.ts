@@ -18,7 +18,7 @@ export interface SaleRecord {
 }
 
 export interface PaymentMethod {
-  method: "cash" | "pos" | "bank_transfer";
+  method: "cash" | "pos" | "bank_transfer" | "credit";
   amount: number;
   reference: string | null;
 }

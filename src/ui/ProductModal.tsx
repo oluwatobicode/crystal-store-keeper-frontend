@@ -1,6 +1,7 @@
 import { X, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 
 import { useProducts } from "../hooks/useProducts";
 import { useSuppliers } from "../hooks/useSuppliers";
@@ -40,8 +41,15 @@ const ProductModal = ({ isOpen, onClose }: ProductModalProps) => {
       toast.success("Product created successfully");
       reset();
       onClose();
-    } catch (error: any) {
-      toast.error(error.response.data.message);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          (error.response?.data as { message: string })?.message ||
+            "An error occurred",
+        );
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     }
   };
 

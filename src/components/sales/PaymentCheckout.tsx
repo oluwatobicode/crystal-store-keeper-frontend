@@ -7,12 +7,14 @@ import {
   Smartphone,
   FileCheck,
   X,
+  Book,
 } from "lucide-react";
 import { useState } from "react";
 import { useSale } from "../../contexts/SaleContext";
 import { useSales } from "../../hooks/useSales";
 import { toast } from "react-hot-toast";
 import type { PaymentMethod } from "../../types/SalesRecord";
+import axios from "axios";
 
 const PaymentCheckout = () => {
   const {
@@ -34,28 +36,34 @@ const PaymentCheckout = () => {
 
   // --- STATE MANAGEMENT ---
   const [paymentMode, setPaymentMode] = useState<"quick" | "split">("quick");
-  const [quickMethod, setQuickMethod] = useState<"cash" | "pos" | "transfer">(
+  const [quickMethod, setQuickMethod] = useState<"cash" | "pos" | "transfer" | "credit">(
     "cash",
   );
   const [reference, setReference] = useState("");
   const [splitMethod, setSplitMethod] = useState<
-    "cash" | "pos" | "bank_transfer"
+    "cash" | "pos" | "bank_transfer" | "credit"
   >("cash");
   const [splitAmount, setSplitAmount] = useState("");
 
   // The grandTotal from context already accounts for discount.
 
   const handleQuickPay = () => {
-    const methodMap: Record<string, "cash" | "pos" | "bank_transfer"> = {
+    const methodMap: Record<string, "cash" | "pos" | "bank_transfer" | "credit"> = {
       cash: "cash",
       pos: "pos",
       transfer: "bank_transfer",
+      credit: "credit",
     };
+
+    if (quickMethod === "credit" && !selectedCustomer) {
+      toast.error("A customer must be selected for credit payments");
+      return;
+    }
 
     const payment: PaymentMethod = {
       method: methodMap[quickMethod],
       amount: grandTotal,
-      reference: quickMethod === "cash" ? null : reference,
+      reference: (quickMethod === "cash" || quickMethod === "credit") ? null : reference,
     };
 
     submitSale([payment]);
@@ -75,10 +83,15 @@ const PaymentCheckout = () => {
       return;
     }
 
+    if (splitMethod === "credit" && !selectedCustomer) {
+      toast.error("A customer must be selected for credit payments");
+      return;
+    }
+
     addPayment({
       method: splitMethod,
       amount: amount,
-      reference: reference || null,
+      reference: (splitMethod === "cash" || splitMethod === "credit") ? null : reference || null,
     });
 
     setSplitAmount("");
@@ -117,8 +130,15 @@ const PaymentCheckout = () => {
       await createSale.mutateAsync(payload);
       toast.success("Sale completed successfully!");
       clearSale();
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Failed to create sale");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          (error.response?.data as { message: string })?.message ||
+            "Failed to create sale",
+        );
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     }
   };
 
@@ -223,7 +243,7 @@ const PaymentCheckout = () => {
 
         {paymentMode === "quick" && (
           <div className="px-[16px] pb-[16px] flex flex-col gap-[16px]">
-            <div className="grid grid-cols-3 gap-[10px]">
+            <div className="grid grid-cols-4 gap-[10px]">
               <button
                 onClick={() => setQuickMethod("cash")}
                 className={`h-[70px] rounded-[10px] flex flex-col items-center justify-center gap-1 border transition-all ${
@@ -259,9 +279,21 @@ const PaymentCheckout = () => {
                 <Smartphone size={20} />
                 <span className="text-[11px] font-bold">Transfer</span>
               </button>
+
+              <button
+                onClick={() => setQuickMethod("credit")}
+                className={`h-[70px] rounded-[10px] flex flex-col items-center justify-center gap-1 border transition-all ${
+                  quickMethod === "credit"
+                    ? "bg-orange-500 border-orange-500 text-white"
+                    : "bg-white border-[#E4E4E7] text-[#1D1D1D] hover:bg-gray-50"
+                } ${!selectedCustomer ? "opacity-40 grayscale cursor-not-allowed" : ""}`}
+              >
+                <Book size={20} />
+                <span className="text-[11px] font-bold">Credit</span>
+              </button>
             </div>
 
-            {quickMethod !== "cash" && (
+            {quickMethod !== "cash" && quickMethod !== "credit" && (
               <div className="bg-white p-[12px] rounded-[8px] border border-[#E4E4E7]">
                 <label className="text-[11px] font-bold text-[#1D1D1D] mb-2 block">
                   Enter {quickMethod.toUpperCase()} Reference
@@ -308,15 +340,16 @@ const PaymentCheckout = () => {
           <div className="px-[16px] pb-[16px] flex flex-col gap-[16px]">
             {/* Method Tabs */}
             <div className="flex gap-2 p-1 bg-[#FAFAFB] rounded-[8px] border border-[#E4E4E7]">
-              {(["cash", "pos", "bank_transfer"] as const).map((m) => (
+              {(["cash", "pos", "bank_transfer", "credit"] as const).map((m) => (
                 <button
                   key={m}
                   onClick={() => setSplitMethod(m)}
+                  disabled={m === "credit" && !selectedCustomer}
                   className={`flex-1 py-1.5 text-[11px] font-bold rounded transition-all ${
                     splitMethod === m
                       ? "bg-white shadow-sm text-[#1D1D1D]"
                       : "text-[#71717A]"
-                  }`}
+                  } ${m === "credit" && !selectedCustomer ? "opacity-40 cursor-not-allowed" : ""}`}
                 >
                   {m.replace("_", " ").toUpperCase()}
                 </button>
@@ -337,7 +370,7 @@ const PaymentCheckout = () => {
                   className="w-full h-[40px] bg-white border border-[#E4E4E7] rounded-[8px] px-3 text-[13px]"
                 />
               </div>
-              {splitMethod !== "cash" && (
+              {splitMethod !== "cash" && splitMethod !== "credit" && (
                 <div>
                   <label className="text-[11px] font-bold text-[#1D1D1D] block mb-1">
                     Reference
