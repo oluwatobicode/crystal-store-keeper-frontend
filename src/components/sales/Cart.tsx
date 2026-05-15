@@ -2,8 +2,14 @@ import { Trash2, Minus, Plus } from "lucide-react";
 import { useSale } from "../../contexts/SaleContext";
 
 const Cart = () => {
-  const { cartItems, updateQuantity, removeFromCart, updateItemDiscount } =
-    useSale();
+  const {
+    cartItems,
+    updateQuantity,
+    removeFromCart,
+    updateItemDiscount,
+    maxDiscountPercent,
+    discountPermission,
+  } = useSale();
 
   if (cartItems.length === 0) {
     return (
@@ -81,24 +87,30 @@ const Cart = () => {
               <div className="h-[1px] bg-[#F4F4F5] w-full" />
 
               <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-[#71717A]">Discount:</span>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={item.discount}
-                      onChange={(e) =>
-                        updateItemDiscount(item._id, Number(e.target.value))
-                      }
-                      className="w-[40px] h-[24px] bg-[#F4F4F5] rounded-[4px] text-center text-[11px] outline-none focus:ring-1 ring-[#1A47FE]"
-                    />
-                    <span className="absolute right-[-12px] top-1/2 -translate-y-1/2 text-[11px] text-[#71717A]">
-                      %
+                {discountPermission !== "none" ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-[#71717A]">
+                      Discount:
                     </span>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="0"
+                        max={maxDiscountPercent}
+                        value={item.discount}
+                        onChange={(e) =>
+                          updateItemDiscount(item._id, Number(e.target.value))
+                        }
+                        className="w-[40px] h-[24px] bg-[#F4F4F5] rounded-[4px] text-center text-[11px] outline-none focus:ring-1 ring-[#1A47FE]"
+                      />
+                      <span className="absolute right-[-12px] top-1/2 -translate-y-1/2 text-[11px] text-[#71717A]">
+                        %
+                      </span>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <span />
+                )}
 
                 <span className="text-[14px] font-bold text-[#1D1D1D]">
                   ₦{total.toLocaleString()}

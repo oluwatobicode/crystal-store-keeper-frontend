@@ -20,8 +20,9 @@ const PaymentCheckout = () => {
   const {
     subtotal,
     grandTotal,
-    discountAmount,
+    globalDiscountPercent,
     setGlobalDiscount,
+    totalDiscount,
     cartItems,
     selectedCustomer,
     payments,
@@ -30,6 +31,8 @@ const PaymentCheckout = () => {
     clearSale,
     vatRate,
     vatAmount,
+    maxDiscountPercent,
+    discountPermission,
   } = useSale();
 
   const { createSale } = useSales();
@@ -114,16 +117,15 @@ const PaymentCheckout = () => {
       items: cartItems.map((item) => ({
         productId: item._id,
         quantity: item.quantity,
+        discountPercent: item.discount,
       })),
       payments: finalPayments.map((p) => ({
         method: p.method,
         amount: p.amount,
         reference: p.reference,
       })),
-      discountAmount: discountAmount,
+      globalDiscountPercent: globalDiscountPercent,
       customerId: selectedCustomer?._id || null,
-      vatRate: vatRate,
-      vatAmount: vatAmount,
     };
 
     try {
@@ -163,17 +165,7 @@ const PaymentCheckout = () => {
           <div className="flex justify-between">
             <span className="text-[14px] text-[#1D1D1D]">Discount</span>
             <span className="text-[14px] font-medium text-red-500">
-              -₦
-              {(
-                subtotal -
-                (subtotal -
-                  subtotal * (discountAmount / 100) -
-                  cartItems.reduce(
-                    (s, i) =>
-                      s + i.sellingPrice * i.quantity * (i.discount / 100),
-                    0,
-                  ))
-              ).toLocaleString()}
+              -₦{totalDiscount.toLocaleString()}
             </span>
           </div>
           {vatRate > 0 && (
@@ -197,23 +189,27 @@ const PaymentCheckout = () => {
       </div>
 
       {/* --- 2. GLOBAL DISCOUNT --- */}
-      <div className="p-[16px] flex flex-col rounded-[12px] bg-white gap-[8px] w-full border border-[#E4E4E7]">
-        <h3 className="text-[12px] font-medium tracking-[0.9px] text-[#1D1D1D]">
-          Global Order Discount
-        </h3>
-        <div className="relative w-full max-w-[150px]">
-          <input
-            type="number"
-            placeholder="0"
-            value={discountAmount}
-            onChange={(e) => setGlobalDiscount(Number(e.target.value))}
-            className="w-full text-[13px] h-[40px] rounded-[8px] border border-[#E4E4E7] px-[12px] outline-none focus:border-[#1A47FE] transition-colors bg-[#FAFAFB]"
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A] text-[12px]">
-            %
-          </span>
+      {discountPermission !== "none" && (
+        <div className="p-[16px] flex flex-col rounded-[12px] bg-white gap-[8px] w-full border border-[#E4E4E7]">
+          <h3 className="text-[12px] font-medium tracking-[0.9px] text-[#1D1D1D]">
+            Global Order Discount (max {maxDiscountPercent}%)
+          </h3>
+          <div className="relative w-full max-w-[150px]">
+            <input
+              type="number"
+              min={0}
+              max={maxDiscountPercent}
+              placeholder="0"
+              value={globalDiscountPercent}
+              onChange={(e) => setGlobalDiscount(Number(e.target.value))}
+              className="w-full text-[13px] h-[40px] rounded-[8px] border border-[#E4E4E7] px-[12px] outline-none focus:border-[#1A47FE] transition-colors bg-[#FAFAFB]"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A] text-[12px]">
+              %
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* --- 3. QUICK PAY ACCORDION --- */}
       <div

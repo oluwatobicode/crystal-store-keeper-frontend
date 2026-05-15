@@ -29,16 +29,18 @@ export const useSales = () => {
 
   const createSale = useMutation({
     mutationFn: async (saleData: {
-      items: { productId: string; quantity: number }[];
+      items: {
+        productId: string;
+        quantity: number;
+        discountPercent: number;
+      }[];
       payments: {
         method: "cash" | "pos" | "bank_transfer" | "credit";
         amount: number;
         reference: string | null;
       }[];
-      discountAmount: number;
+      globalDiscountPercent: number;
       customerId: string | null;
-      vatRate: number;
-      vatAmount: number;
     }) => {
       const response = await api.post("/sales", saleData, {
         withCredentials: true,

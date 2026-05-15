@@ -9,10 +9,12 @@ export interface CartItem extends Product {
   discount: number;
 }
 
+export type DiscountPermission = "none" | "small" | "large";
+
 interface SaleContextType {
   cartItems: CartItem[];
   selectedCustomer: Customer | null;
-  discountAmount: number;
+  globalDiscountPercent: number;
   payments: PaymentMethod[];
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
@@ -28,6 +30,8 @@ interface SaleContextType {
   vatRate: number;
   vatAmount: number;
   grandTotal: number;
+  maxDiscountPercent: number;
+  discountPermission: DiscountPermission;
 }
 
 const SaleContext = createContext<SaleContextType | undefined>(undefined);
@@ -38,13 +42,19 @@ export const SaleProvider: React.FC<{ children: React.ReactNode }> = ({
   const { getSettings } = useSettings();
   const settings = getSettings?.data?.data?.data;
   const vatRate = settings?.system?.vatEnabled ? settings.system.vatRate : 0;
+  const discountPermission: DiscountPermission =
+    settings?.pos?.discountPermission ?? "none";
+  const maxDiscountPercent: number = settings?.pos?.maxDiscountPercent ?? 0;
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null,
   );
-  const [discountAmount, setDiscountAmount] = useState<number>(0);
+  const [globalDiscountPercent, setGlobalDiscountPercent] = useState<number>(0);
   const [payments, setPayments] = useState<PaymentMethod[]>([]);
+
+  const clampDiscount = (value: number) =>
+    Math.min(Math.max(value || 0, 0), maxDiscountPercent);
 
   const addToCart = (product: Product) => {
     setCartItems((prev) => {
@@ -79,7 +89,9 @@ export const SaleProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateItemDiscount = (productId: string, discount: number) => {
     setCartItems((prev) =>
       prev.map((item) =>
-        item._id === productId ? { ...item, discount } : item,
+        item._id === productId
+          ? { ...item, discount: clampDiscount(discount) }
+          : item,
       ),
     );
   };
@@ -89,7 +101,7 @@ export const SaleProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const setGlobalDiscount = (discount: number) => {
-    setDiscountAmount(discount);
+    setGlobalDiscountPercent(clampDiscount(discount));
   };
 
   const addPayment = (payment: PaymentMethod) => {
@@ -103,7 +115,7 @@ export const SaleProvider: React.FC<{ children: React.ReactNode }> = ({
   const clearSale = () => {
     setCartItems([]);
     setSelectedCustomer(null);
-    setDiscountAmount(0);
+    setGlobalDiscountPercent(0);
     setPayments([]);
   };
 
@@ -120,9 +132,10 @@ export const SaleProvider: React.FC<{ children: React.ReactNode }> = ({
         sum + item.sellingPrice * item.quantity * (item.discount / 100),
       0,
     );
-    const globalDist = subtotal * (discountAmount / 100);
-    return itemDiscount + globalDist;
-  }, [cartItems, subtotal, discountAmount]);
+    const afterItemDiscounts = subtotal - itemDiscount;
+    const globalDiscount = afterItemDiscounts * (globalDiscountPercent / 100);
+    return itemDiscount + globalDiscount;
+  }, [cartItems, subtotal, globalDiscountPercent]);
 
   const afterDiscount = subtotal - totalDiscount;
   const vatAmount = afterDiscount * (vatRate / 100);
@@ -133,7 +146,7 @@ export const SaleProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         cartItems,
         selectedCustomer,
-        discountAmount,
+        globalDiscountPercent,
         payments,
         addToCart,
         removeFromCart,
@@ -149,6 +162,8 @@ export const SaleProvider: React.FC<{ children: React.ReactNode }> = ({
         vatRate,
         vatAmount,
         grandTotal,
+        maxDiscountPercent,
+        discountPermission,
       }}
     >
       {children}
