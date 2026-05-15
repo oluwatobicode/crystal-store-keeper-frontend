@@ -162,7 +162,7 @@ const authReducer = (state: AuthState, action: authAction) => {
           owner: {
             fullname: action.payload.owner?.fullname,
             email: action.payload.owner?.email,
-            username: action.payload.owner.username,
+            username: action.payload.owner?.username,
           },
         },
       };
@@ -281,7 +281,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       dispatch({
         type: "AUTH_SIGNED_UP",
-        payload: response.data,
+        payload: response.data.data,
       });
       return {
         success: true,
